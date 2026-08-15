@@ -6,10 +6,10 @@
  * paper background, ink text, hairline rules, square corners, stamps.
  */
 @theme {
-  --color-ink: #ece5d6; /* page: aged paper */
-  --color-panel: #f9f6ee; /* card: fresh sheet */
+  --color-ink: #ddd3bd; /* desk: what shows around the sheet */
+  --color-panel: #f9f6ee; /* the sheet itself */
   --color-panel-2: #f0ead9; /* inset / hover */
-  --color-line: #a89b80; /* strong rule */
+  --color-line: #9d9075; /* strong rule */
   --color-line-soft: #d9d0ba; /* hairline */
   --color-text: #201b12; /* ink */
   --color-muted: #58503f;

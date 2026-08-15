@@ -2,17 +2,25 @@ import Link from 'next/link'
 import { formatNumber } from '@/lib/format'
 import type { EndpointHealth, EventStatus } from '@/lib/types'
 
-export function Panel({
+/**
+ * Pages are vertical stacks of ruled sections on the sheet, never floating
+ * cards. Sheet wraps a page; Section is one ruled band inside it.
+ */
+export function Sheet({ children }: { children: React.ReactNode }) {
+  return <div className="divide-y divide-line">{children}</div>
+}
+
+export function Section({
   children,
   className = '',
 }: {
   children: React.ReactNode
   className?: string
 }) {
-  return <section className={`border border-line bg-panel ${className}`}>{children}</section>
+  return <section className={className}>{children}</section>
 }
 
-export function PanelTitle({
+export function SectionTitle({
   children,
   aside,
 }: {
@@ -20,38 +28,45 @@ export function PanelTitle({
   aside?: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b-3 border-double border-line px-5 py-3">
-      <h2 className="font-serif text-[15px] font-semibold tracking-tight">{children}</h2>
+    <div className="flex items-center justify-between gap-4 border-b border-line-soft px-6 pb-3 pt-5">
+      <h2 className="font-serif text-[16px] font-semibold tracking-tight">{children}</h2>
       {aside}
     </div>
   )
 }
 
-export function Stat({
-  label,
-  value,
-  hint,
-  tone = 'neutral',
-}: {
+export type TotalItem = {
   label: string
   value: number | string
   hint?: string
   tone?: 'neutral' | 'good' | 'warn' | 'bad'
-}) {
-  const toneClass = {
-    neutral: 'text-text',
-    good: 'text-good',
-    warn: 'text-warn',
-    bad: 'text-bad',
-  }[tone]
+}
 
+const TONE_TEXT = {
+  neutral: 'text-text',
+  good: 'text-good',
+  warn: 'text-warn',
+  bad: 'text-bad',
+}
+
+/** Ledger totals: label, dot leader, figure — the way a sum line is written. */
+export function Totals({ items }: { items: TotalItem[] }) {
   return (
-    <div className="border border-line bg-panel px-4 py-3.5">
-      <div className="text-[11px] uppercase tracking-[0.14em] text-faint">{label}</div>
-      <div className={`tnum mt-1.5 font-mono text-2xl font-medium ${toneClass}`}>
-        {typeof value === 'number' ? formatNumber(value) : value}
-      </div>
-      {hint ? <div className="mt-0.5 text-[12px] text-faint">{hint}</div> : null}
+    <div className="grid grid-cols-1 gap-x-10 gap-y-3 px-6 py-5 sm:grid-cols-2">
+      {items.map((item) => (
+        <div key={item.label}>
+          <div className="flex items-baseline gap-2 text-[13px]">
+            <span className="text-muted">{item.label}</span>
+            <span aria-hidden className="flex-1 border-b border-dotted border-line" />
+            <span className={`tnum font-mono text-[15px] font-medium ${TONE_TEXT[item.tone ?? 'neutral']}`}>
+              {typeof item.value === 'number' ? formatNumber(item.value) : item.value}
+            </span>
+          </div>
+          {item.hint ? (
+            <div className="mt-0.5 text-right text-[11px] italic text-faint">{item.hint}</div>
+          ) : null}
+        </div>
+      ))}
     </div>
   )
 }
@@ -102,30 +117,33 @@ export function SubmitButton({
 }) {
   const variantClass =
     variant === 'primary'
-      ? 'border-text bg-text text-panel hover:bg-transparent hover:text-text'
+      ? 'border-text font-semibold text-text hover:bg-text hover:text-panel'
       : 'border-line text-muted hover:border-text hover:text-text'
 
   return (
     <button
       type="submit"
-      className={`cursor-pointer border px-3 py-1.5 text-[12px] font-medium transition ${variantClass}`}
+      className={`cursor-pointer border px-3 py-1 text-[12px] transition ${variantClass}`}
     >
       {children}
     </button>
   )
 }
 
-export function BackLink({ href, children }: { href: string; children: React.ReactNode }) {
+/** Thin navigation strip at the top of inner pages. */
+export function BackStrip({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="text-[12px] text-faint transition hover:text-muted">
-      ← {children}
-    </Link>
+    <div className="px-6 py-2.5">
+      <Link href={href} className="text-[12px] text-faint transition hover:text-muted">
+        ← {children}
+      </Link>
+    </div>
   )
 }
 
 export function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="px-5 py-10 text-center font-serif text-[14px] italic text-faint">
+    <div className="px-6 py-10 text-center font-serif text-[14px] italic text-faint">
       {children}
     </div>
   )

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { BackLink, Empty, Panel, PanelTitle, StatusPill } from '@/components/ui'
+import { BackStrip, Empty, Section, SectionTitle, Sheet, StatusPill } from '@/components/ui'
 import { timeAgo, truncate } from '@/lib/format'
 import { listEvents } from '@/lib/stats'
 
@@ -21,18 +21,18 @@ export default async function EventsPage({
   const events = await listEvents({ status, limit: 200 })
 
   return (
-    <div className="space-y-4">
-      <BackLink href="/">volver al panel</BackLink>
+    <Sheet>
+      <BackStrip href="/">volver al panel</BackStrip>
 
-      <Panel>
-        <PanelTitle
+      <Section>
+        <SectionTitle
           aside={
-            <div className="flex gap-1">
+            <div className="flex gap-3">
               {FILTERS.map((filter) => (
                 <Link
                   key={filter.value}
                   href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
-                  className={`border-b-2 px-2 py-1 text-[12px] transition ${
+                  className={`border-b-2 py-0.5 text-[12px] transition ${
                     status === filter.value
                       ? 'border-text text-text'
                       : 'border-transparent text-faint hover:text-muted'
@@ -45,19 +45,19 @@ export default async function EventsPage({
           }
         >
           Eventos
-        </PanelTitle>
+        </SectionTitle>
 
         {events.length === 0 ? (
           <Empty>No hay eventos con ese estado.</Empty>
         ) : (
           <table className="w-full text-[13px]">
-            <thead className="text-[11px] uppercase tracking-wider text-faint">
+            <thead className="text-[11px] uppercase tracking-[0.08em] text-faint">
               <tr className="border-b border-line-soft">
-                <th className="px-5 py-2 text-left font-medium">Evento</th>
-                <th className="px-5 py-2 text-left font-medium">Integración</th>
-                <th className="px-5 py-2 text-left font-medium">Estado</th>
-                <th className="px-5 py-2 text-right font-medium">Intentos</th>
-                <th className="px-5 py-2 text-right font-medium">Recibido</th>
+                <th className="px-6 py-2 text-left font-medium">Evento</th>
+                <th className="px-6 py-2 text-left font-medium">Integración</th>
+                <th className="px-6 py-2 text-left font-medium">Estado</th>
+                <th className="px-6 py-2 text-right font-medium">Intentos</th>
+                <th className="px-6 py-2 text-right font-medium">Recibido</th>
               </tr>
             </thead>
             <tbody>
@@ -66,7 +66,7 @@ export default async function EventsPage({
                   key={event.id}
                   className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
                 >
-                  <td className="px-5 py-2.5">
+                  <td className="px-6 py-2.5">
                     <Link
                       href={`/events/${event.id}`}
                       className="font-mono text-[12px] text-faint hover:text-accent"
@@ -74,12 +74,14 @@ export default async function EventsPage({
                       {truncate(event.id, 16)}
                     </Link>
                   </td>
-                  <td className="px-5 py-2.5 text-muted">{event.endpoint_name}</td>
-                  <td className="px-5 py-2.5">
+                  <td className="px-6 py-2.5 text-muted">{event.endpoint_name}</td>
+                  <td className="px-6 py-2.5">
                     <StatusPill status={event.status} attempts={event.attempt_count} />
                   </td>
-                  <td className="tnum px-5 py-2.5 text-right text-faint">{event.attempt_count}</td>
-                  <td className="px-5 py-2.5 text-right text-faint">
+                  <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-faint">
+                    {event.attempt_count}
+                  </td>
+                  <td className="px-6 py-2.5 text-right text-faint">
                     {timeAgo(event.received_at)}
                   </td>
                 </tr>
@@ -87,7 +89,7 @@ export default async function EventsPage({
             </tbody>
           </table>
         )}
-      </Panel>
-    </div>
+      </Section>
+    </Sheet>
   )
 }

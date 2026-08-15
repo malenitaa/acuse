@@ -2,14 +2,15 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { toggleEndpointAction } from '@/app/actions'
 import {
-  BackLink,
+  BackStrip,
   Empty,
   HealthBadge,
-  Panel,
-  PanelTitle,
-  Stat,
+  Section,
+  SectionTitle,
+  Sheet,
   StatusPill,
   SubmitButton,
+  Totals,
 } from '@/components/ui'
 import { formatPercent, timeAgo, truncate } from '@/lib/format'
 import { retryScheduleLabels } from '@/lib/retry'
@@ -27,10 +28,10 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
   const schedule = retryScheduleLabels(endpoint.max_attempts)
 
   return (
-    <div className="space-y-4">
-      <BackLink href="/">volver al panel</BackLink>
+    <Sheet>
+      <BackStrip href="/">volver al panel</BackStrip>
 
-      <Panel className="px-6 py-5">
+      <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-xl font-semibold tracking-tight">{endpoint.name}</h1>
@@ -51,31 +52,33 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
           <UrlLine label="Y nosotros entregamos acá">{endpoint.destination_url}</UrlLine>
         </div>
 
-        <p className="mt-5 text-[12px] leading-relaxed text-faint">
+        <p className="mt-5 text-[12px] italic leading-relaxed text-faint">
           Si el destino no contesta, reintentamos {endpoint.max_attempts} veces separando cada
-          intento: {schedule.join(' · ')}. Después queda marcado como sin entregar y esperando a una
-          persona.
+          intento: {schedule.join(' · ')}. Después queda marcado como sin entregar y esperando a
+          una persona.
         </p>
-      </Panel>
+      </Section>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Recibidos" value={endpoint.total} />
-        <Stat
-          label="Entregados"
-          value={endpoint.delivered}
-          hint={formatPercent(endpoint.delivered, endpoint.total)}
-          tone="good"
-        />
-        <Stat label="Rescatados" value={endpoint.recovered} tone="good" />
-        <Stat
-          label="Sin entregar"
-          value={endpoint.dead}
-          tone={endpoint.dead > 0 ? 'bad' : 'neutral'}
-        />
-      </div>
+      <Totals
+        items={[
+          { label: 'Recibidos', value: endpoint.total },
+          {
+            label: 'Entregados',
+            value: endpoint.delivered,
+            hint: formatPercent(endpoint.delivered, endpoint.total),
+            tone: 'good',
+          },
+          { label: 'Rescatados', value: endpoint.recovered, tone: 'good' },
+          {
+            label: 'Sin entregar',
+            value: endpoint.dead,
+            tone: endpoint.dead > 0 ? 'bad' : 'neutral',
+          },
+        ]}
+      />
 
-      <Panel>
-        <PanelTitle>Eventos de esta integración</PanelTitle>
+      <Section>
+        <SectionTitle>Eventos de esta integración</SectionTitle>
         {events.length === 0 ? (
           <Empty>Todavía no llegó ningún evento acá.</Empty>
         ) : (
@@ -86,7 +89,7 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
                   key={event.id}
                   className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
                 >
-                  <td className="px-5 py-2.5">
+                  <td className="px-6 py-2.5">
                     <Link
                       href={`/events/${event.id}`}
                       className="font-mono text-[12px] text-faint hover:text-accent"
@@ -94,13 +97,13 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
                       {truncate(event.id, 16)}
                     </Link>
                   </td>
-                  <td className="px-5 py-2.5">
+                  <td className="px-6 py-2.5">
                     <StatusPill status={event.status} attempts={event.attempt_count} />
                   </td>
-                  <td className="tnum px-5 py-2.5 text-right text-faint">
+                  <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-faint">
                     {event.attempt_count} int.
                   </td>
-                  <td className="px-5 py-2.5 text-right text-faint">
+                  <td className="px-6 py-2.5 text-right text-faint">
                     {timeAgo(event.received_at)}
                   </td>
                 </tr>
@@ -108,15 +111,15 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
             </tbody>
           </table>
         )}
-      </Panel>
-    </div>
+      </Section>
+    </Sheet>
   )
 }
 
 function UrlLine({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wider text-faint">{label}</div>
+      <div className="text-[11px] uppercase tracking-[0.08em] text-faint">{label}</div>
       <code className="mt-1 block overflow-x-auto border border-line-soft bg-panel-2 px-3 py-2 font-mono text-[12px] text-accent">
         {children}
       </code>

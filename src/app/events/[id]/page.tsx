@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { replayEventAction } from '@/app/actions'
-import { BackLink, Panel, PanelTitle, StatusPill, SubmitButton } from '@/components/ui'
+import { BackStrip, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { formatTimestamp, timeAgo } from '@/lib/format'
 import { getAttempts, getEvent } from '@/lib/stats'
 import type { Attempt } from '@/lib/types'
@@ -16,10 +16,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const attempts = await getAttempts(event.id)
 
   return (
-    <div className="space-y-4">
-      <BackLink href="/">volver al panel</BackLink>
+    <Sheet>
+      <BackStrip href="/">volver al panel</BackStrip>
 
-      <Panel className="px-6 py-5">
+      <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="font-mono text-[13px] text-muted">{event.id}</div>
@@ -57,12 +57,12 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             }
           />
         </dl>
-      </Panel>
+      </Section>
 
-      <Panel>
-        <PanelTitle>Intentos de entrega</PanelTitle>
+      <Section>
+        <SectionTitle>Intentos de entrega</SectionTitle>
         {attempts.length === 0 ? (
-          <div className="px-5 py-8 text-center text-[13px] text-faint">
+          <div className="px-6 py-8 text-center font-serif text-[14px] italic text-faint">
             Todavía no se intentó entregar. El evento ya está guardado.
           </div>
         ) : (
@@ -72,15 +72,15 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             ))}
           </ol>
         )}
-      </Panel>
+      </Section>
 
-      <Panel>
-        <PanelTitle>Contenido recibido</PanelTitle>
-        <pre className="overflow-x-auto px-5 py-4 font-mono text-[12px] leading-relaxed text-muted">
+      <Section>
+        <SectionTitle>Contenido recibido</SectionTitle>
+        <pre className="overflow-x-auto px-6 py-4 font-mono text-[12px] leading-relaxed text-muted">
           {JSON.stringify(event.payload, null, 2)}
         </pre>
-      </Panel>
-    </div>
+      </Section>
+    </Sheet>
   )
 }
 
@@ -88,15 +88,15 @@ function AttemptRow({ attempt }: { attempt: Attempt }) {
   const ok = attempt.outcome === 'success'
 
   return (
-    <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-5 py-3">
+    <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-6 py-3">
       <span
         className={`tnum inline-flex size-5 shrink-0 items-center justify-center border font-mono text-[11px] font-medium ${
-          ok ? 'border-good/40 text-good' : 'border-bad/40 text-bad'
+          ok ? 'border-good/60 text-good' : 'border-bad/60 text-bad'
         }`}
       >
         {attempt.n}
       </span>
-      <span className={`tnum text-[13px] font-medium ${ok ? 'text-good' : 'text-bad'}`}>
+      <span className={`tnum font-mono text-[13px] font-medium ${ok ? 'text-good' : 'text-bad'}`}>
         {attempt.status_code ? `HTTP ${attempt.status_code}` : 'sin respuesta'}
       </span>
       <span className="text-[12px] text-faint">{formatTimestamp(attempt.started_at)}</span>
@@ -119,7 +119,7 @@ function AttemptRow({ attempt }: { attempt: Attempt }) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-wider text-faint">{label}</dt>
+      <dt className="text-[11px] uppercase tracking-[0.08em] text-faint">{label}</dt>
       <dd className="tnum mt-0.5 text-muted">{value}</dd>
     </div>
   )
