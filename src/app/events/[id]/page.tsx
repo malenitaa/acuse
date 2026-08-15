@@ -90,7 +90,7 @@ function AttemptRow({ attempt }: { attempt: Attempt }) {
   return (
     <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-5 py-3">
       <span
-        className={`tnum inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-medium ${
+        className={`tnum inline-flex size-5 shrink-0 items-center justify-center border font-mono text-[11px] font-medium ${
           ok ? 'border-good/40 text-good' : 'border-bad/40 text-bad'
         }`}
       >
@@ -102,7 +102,7 @@ function AttemptRow({ attempt }: { attempt: Attempt }) {
       <span className="text-[12px] text-faint">{formatTimestamp(attempt.started_at)}</span>
       <span className="tnum text-[12px] text-faint">{attempt.duration_ms}ms</span>
       {attempt.manual ? (
-        <span className="rounded border border-line px-1.5 py-0.5 text-[10px] text-faint">
+        <span className="border border-line px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-faint">
           manual
         </span>
       ) : null}

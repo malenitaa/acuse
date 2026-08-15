@@ -9,9 +9,7 @@ export function Panel({
   children: React.ReactNode
   className?: string
 }) {
-  return (
-    <section className={`rounded-lg border border-line bg-panel ${className}`}>{children}</section>
-  )
+  return <section className={`border border-line bg-panel ${className}`}>{children}</section>
 }
 
 export function PanelTitle({
@@ -22,8 +20,8 @@ export function PanelTitle({
   aside?: React.ReactNode
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-line-soft px-5 py-3">
-      <h2 className="text-[13px] font-semibold tracking-tight">{children}</h2>
+    <div className="flex items-center justify-between gap-4 border-b-3 border-double border-line px-5 py-3">
+      <h2 className="font-serif text-[15px] font-semibold tracking-tight">{children}</h2>
       {aside}
     </div>
   )
@@ -48,9 +46,9 @@ export function Stat({
   }[tone]
 
   return (
-    <div className="rounded-lg border border-line bg-panel px-4 py-3.5">
-      <div className="text-[11px] uppercase tracking-wider text-faint">{label}</div>
-      <div className={`tnum mt-1.5 text-2xl font-semibold ${toneClass}`}>
+    <div className="border border-line bg-panel px-4 py-3.5">
+      <div className="text-[11px] uppercase tracking-[0.14em] text-faint">{label}</div>
+      <div className={`tnum mt-1.5 font-mono text-2xl font-medium ${toneClass}`}>
         {typeof value === 'number' ? formatNumber(value) : value}
       </div>
       {hint ? <div className="mt-0.5 text-[12px] text-faint">{hint}</div> : null}
@@ -59,38 +57,37 @@ export function Stat({
 }
 
 const STATUS_STYLES: Record<EventStatus, { label: string; className: string }> = {
-  delivered: { label: 'entregado', className: 'border-good/30 bg-good/10 text-good' },
-  pending: { label: 'reintentando', className: 'border-warn/30 bg-warn/10 text-warn' },
-  dead: { label: 'sin entregar', className: 'border-bad/30 bg-bad/10 text-bad' },
+  delivered: { label: 'entregado', className: 'border-good/70 text-good' },
+  pending: { label: 'reintentando', className: 'border-warn/70 text-warn' },
+  dead: { label: 'sin entregar', className: 'border-bad/70 text-bad' },
 }
 
+/** Rendered as a rubber stamp: bordered, uppercase, no fill. */
 export function StatusPill({ status, attempts }: { status: EventStatus; attempts?: number }) {
   const style = STATUS_STYLES[status]
-  const label =
-    status === 'pending' && attempts === 0 ? 'en cola' : style.label
+  const label = status === 'pending' && attempts === 0 ? 'en cola' : style.label
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium ${style.className}`}
+      className={`inline-flex items-center border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.1em] ${style.className}`}
     >
       {label}
     </span>
   )
 }
 
-const HEALTH_STYLES: Record<EndpointHealth['health'], { label: string; dot: string; text: string }> =
-  {
-    healthy: { label: 'sano', dot: 'bg-good', text: 'text-good' },
-    degraded: { label: 'inestable', dot: 'bg-warn', text: 'text-warn' },
-    down: { label: 'caído', dot: 'bg-bad', text: 'text-bad' },
-    idle: { label: 'sin tráfico', dot: 'bg-faint', text: 'text-faint' },
-  }
+const HEALTH_STYLES: Record<EndpointHealth['health'], { label: string; text: string }> = {
+  healthy: { label: 'sano', text: 'text-good' },
+  degraded: { label: 'inestable', text: 'text-warn' },
+  down: { label: 'caído', text: 'text-bad' },
+  idle: { label: 'sin tráfico', text: 'text-faint' },
+}
 
 export function HealthBadge({ health }: { health: EndpointHealth['health'] }) {
   const style = HEALTH_STYLES[health]
   return (
     <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium ${style.text}`}>
-      <span aria-hidden className={`inline-block size-1.5 rounded-full ${style.dot}`} />
+      <span aria-hidden className="inline-block size-1.5 bg-current" />
       {style.label}
     </span>
   )
@@ -105,13 +102,13 @@ export function SubmitButton({
 }) {
   const variantClass =
     variant === 'primary'
-      ? 'border-accent/40 bg-accent/10 text-accent hover:bg-accent/20'
-      : 'border-line bg-panel-2 text-muted hover:border-line hover:text-text'
+      ? 'border-text bg-text text-panel hover:bg-transparent hover:text-text'
+      : 'border-line text-muted hover:border-text hover:text-text'
 
   return (
     <button
       type="submit"
-      className={`cursor-pointer rounded-md border px-3 py-1.5 text-[12px] font-medium transition ${variantClass}`}
+      className={`cursor-pointer border px-3 py-1.5 text-[12px] font-medium transition ${variantClass}`}
     >
       {children}
     </button>
@@ -127,5 +124,9 @@ export function BackLink({ href, children }: { href: string; children: React.Rea
 }
 
 export function Empty({ children }: { children: React.ReactNode }) {
-  return <div className="px-5 py-10 text-center text-[13px] text-faint">{children}</div>
+  return (
+    <div className="px-5 py-10 text-center font-serif text-[14px] italic text-faint">
+      {children}
+    </div>
+  )
 }

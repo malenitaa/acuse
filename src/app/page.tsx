@@ -169,8 +169,8 @@ export default async function DashboardPage() {
 function Headline({ stats }: { stats: Stats }) {
   return (
     <Panel className="px-6 py-6">
-      <div className="text-[11px] uppercase tracking-wider text-faint">Eventos rescatados</div>
-      <div className="tnum mt-1 text-5xl font-semibold text-good">
+      <div className="text-[11px] uppercase tracking-[0.14em] text-faint">Eventos rescatados</div>
+      <div className="tnum mt-1 font-serif text-6xl font-semibold text-good">
         {formatNumber(stats.recovered)}
       </div>
       <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-muted">
@@ -189,15 +189,15 @@ function Headline({ stats }: { stats: Stats }) {
  */
 function CompositionBar({ stats }: { stats: Stats }) {
   const segments = [
-    { key: 'firstTry', value: stats.firstTry, label: 'primer intento', bar: 'bg-good/40', dot: 'bg-good/40' },
-    { key: 'recovered', value: stats.recovered, label: 'rescatados', bar: 'bg-good', dot: 'bg-good' },
-    { key: 'pending', value: stats.pending, label: 'en reintento', bar: 'bg-warn', dot: 'bg-warn' },
-    { key: 'dead', value: stats.dead, label: 'sin entregar', bar: 'bg-bad', dot: 'bg-bad' },
+    { key: 'firstTry', value: stats.firstTry, label: 'primer intento', bar: 'bg-good/35' },
+    { key: 'recovered', value: stats.recovered, label: 'rescatados', bar: 'bg-good' },
+    { key: 'pending', value: stats.pending, label: 'en reintento', bar: 'bg-warn' },
+    { key: 'dead', value: stats.dead, label: 'sin entregar', bar: 'bg-bad' },
   ].filter((segment) => segment.value > 0)
 
   return (
     <div className="mt-5 max-w-xl">
-      <div className="flex h-1.5 overflow-hidden rounded-full bg-line">
+      <div className="flex h-2 border border-line-soft bg-panel-2">
         {segments.map((segment) => (
           <div
             key={segment.key}
@@ -209,7 +209,7 @@ function CompositionBar({ stats }: { stats: Stats }) {
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-faint">
         {segments.map((segment) => (
           <span key={segment.key}>
-            <span className={`mr-1.5 inline-block size-1.5 rounded-full align-middle ${segment.dot}`} />
+            <span className={`mr-1.5 inline-block size-2 align-middle ${segment.bar}`} />
             {segment.label} · {formatPercent(segment.value, stats.received)}
           </span>
         ))}
@@ -220,8 +220,8 @@ function CompositionBar({ stats }: { stats: Stats }) {
 
 function BrokenBanner({ names }: { names: string[] }) {
   return (
-    <div className="rounded-lg border border-bad/30 bg-bad/10 px-5 py-3.5">
-      <div className="text-[13px] font-medium text-bad">
+    <div className="border-2 border-bad/70 px-5 py-3.5">
+      <div className="font-mono text-[12px] font-semibold uppercase tracking-[0.1em] text-bad">
         {names.length === 1
           ? `«${names[0]}» dejó de responder`
           : `${names.length} integraciones dejaron de responder`}

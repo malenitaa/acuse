@@ -33,7 +33,7 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
       <Panel className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-lg font-semibold tracking-tight">{endpoint.name}</h1>
+            <h1 className="font-serif text-xl font-semibold tracking-tight">{endpoint.name}</h1>
             <div className="mt-1.5">
               <HealthBadge health={endpoint.health} />
             </div>
@@ -117,7 +117,7 @@ function UrlLine({ label, children }: { label: string; children: React.ReactNode
   return (
     <div>
       <div className="text-[11px] uppercase tracking-wider text-faint">{label}</div>
-      <code className="mt-1 block overflow-x-auto rounded-md border border-line bg-panel-2 px-3 py-2 font-mono text-[12px] text-accent">
+      <code className="mt-1 block overflow-x-auto border border-line-soft bg-panel-2 px-3 py-2 font-mono text-[12px] text-accent">
         {children}
       </code>
     </div>

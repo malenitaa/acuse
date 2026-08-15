@@ -32,10 +32,10 @@ export default async function EventsPage({
                 <Link
                   key={filter.value}
                   href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
-                  className={`rounded-md px-2.5 py-1 text-[12px] transition ${
+                  className={`border-b-2 px-2 py-1 text-[12px] transition ${
                     status === filter.value
-                      ? 'bg-panel-2 text-text'
-                      : 'text-faint hover:text-muted'
+                      ? 'border-text text-text'
+                      : 'border-transparent text-faint hover:text-muted'
                   }`}
                 >
                   {filter.label}

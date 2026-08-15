@@ -1,25 +1,30 @@
 @import 'tailwindcss';
 
+/*
+ * Ledger-book look. The product is literally a book of delivery receipts
+ * ("acuse de recibo"), so the design borrows from printed record books:
+ * paper background, ink text, hairline rules, square corners, stamps.
+ */
 @theme {
-  --color-ink: #07090d;
-  --color-panel: #0e1219;
-  --color-panel-2: #141a24;
-  --color-line: #1e2632;
-  --color-line-soft: #171d27;
-  --color-text: #e6ebf2;
-  --color-muted: #8b96a8;
-  --color-faint: #5c6675;
+  --color-ink: #ece5d6; /* page: aged paper */
+  --color-panel: #f9f6ee; /* card: fresh sheet */
+  --color-panel-2: #f0ead9; /* inset / hover */
+  --color-line: #a89b80; /* strong rule */
+  --color-line-soft: #d9d0ba; /* hairline */
+  --color-text: #201b12; /* ink */
+  --color-muted: #58503f;
+  --color-faint: #8b8168;
+  --color-good: #1f6240; /* ledger green */
+  --color-warn: #8f6a12; /* ochre */
+  --color-bad: #9f2a1e; /* stamp red */
+  --color-accent: #2a4d78; /* fountain-pen blue */
 
-  --color-good: #34d399;
-  --color-warn: #fbbf24;
-  --color-bad: #f87171;
-  --color-accent: #7dd3fc;
-
-  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+  --font-serif: 'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
