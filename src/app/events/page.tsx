@@ -1,0 +1,93 @@
+import Link from 'next/link'
+import { BackLink, Empty, Panel, PanelTitle, StatusPill } from '@/components/ui'
+import { timeAgo, truncate } from '@/lib/format'
+import { listEvents } from '@/lib/stats'
+
+export const dynamic = 'force-dynamic'
+
+const FILTERS = [
+  { value: 'all', label: 'Todos' },
+  { value: 'pending', label: 'En reintento' },
+  { value: 'dead', label: 'Sin entregar' },
+  { value: 'delivered', label: 'Entregados' },
+]
+
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>
+}) {
+  const { status = 'all' } = await searchParams
+  const events = await listEvents({ status, limit: 200 })
+
+  return (
+    <div className="space-y-4">
+      <BackLink href="/">volver al panel</BackLink>
+
+      <Panel>
+        <PanelTitle
+          aside={
+            <div className="flex gap-1">
+              {FILTERS.map((filter) => (
+                <Link
+                  key={filter.value}
+                  href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
+                  className={`rounded-md px-2.5 py-1 text-[12px] transition ${
+                    status === filter.value
+                      ? 'bg-panel-2 text-text'
+                      : 'text-faint hover:text-muted'
+                  }`}
+                >
+                  {filter.label}
+                </Link>
+              ))}
+            </div>
+          }
+        >
+          Eventos
+        </PanelTitle>
+
+        {events.length === 0 ? (
+          <Empty>No hay eventos con ese estado.</Empty>
+        ) : (
+          <table className="w-full text-[13px]">
+            <thead className="text-[11px] uppercase tracking-wider text-faint">
+              <tr className="border-b border-line-soft">
+                <th className="px-5 py-2 text-left font-medium">Evento</th>
+                <th className="px-5 py-2 text-left font-medium">Integración</th>
+                <th className="px-5 py-2 text-left font-medium">Estado</th>
+                <th className="px-5 py-2 text-right font-medium">Intentos</th>
+                <th className="px-5 py-2 text-right font-medium">Recibido</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map((event) => (
+                <tr
+                  key={event.id}
+                  className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
+                >
+                  <td className="px-5 py-2.5">
+                    <Link
+                      href={`/events/${event.id}`}
+                      className="font-mono text-[12px] text-faint hover:text-accent"
+                    >
+                      {truncate(event.id, 16)}
+                    </Link>
+                  </td>
+                  <td className="px-5 py-2.5 text-muted">{event.endpoint_name}</td>
+                  <td className="px-5 py-2.5">
+                    <StatusPill status={event.status} attempts={event.attempt_count} />
+                  </td>
+                  <td className="tnum px-5 py-2.5 text-right text-faint">{event.attempt_count}</td>
+                  <td className="px-5 py-2.5 text-right text-faint">
+                    {timeAgo(event.received_at)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Panel>
+    </div>
+  )
+}
