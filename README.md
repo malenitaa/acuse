@@ -1,115 +1,114 @@
 # Acuse
 
-**Ningún evento se pierde.** Acuse se pone entre quien manda un webhook y el sistema que
-tiene que recibirlo, y garantiza que llegue: guarda el evento antes de contestar, reintenta
-si el destino falla, y muestra cuántas entregas rescató.
+**A webhook delivery guardian: no event gets lost.** Acuse sits between whoever sends a
+webhook and the system that must receive it. It stores every event before answering,
+retries failed deliveries automatically, and shows you exactly how many it rescued.
 
----
+![Acuse dashboard](docs/panel.png)
 
-## El problema
+> **¿Poco técnico? Leelo en criollo:** cuando dos sistemas se conectan (tu tienda con tu
+> facturación, un formulario con tu CRM), se avisan las cosas con mensajes automáticos. Si el
+> que recibe está caído dos minutos, esos mensajes **se pierden y nadie se entera**: la factura
+> no se emite, el cliente no entra al CRM. Acuse es un contestador terco que se pone en el
+> medio: anota todo antes que nada, insiste hasta entregar, y te muestra en un panel cuántos
+> mensajes salvó y cuáles necesitan una mano.
 
-Una empresa conecta Shopify con su ERP, sus formularios con el CRM, su facturación con
-contabilidad. Cada conexión es una URL que recibe un webhook.
+## The problem
 
-Cuando el destino se cae dos minutos, esos webhooks **no vuelven**. El que los mandó
-reintenta un par de veces, se cansa y los descarta. Nadie se entera. La factura no se emitió,
-el lead no entró al CRM, el pedido no llegó al depósito — y se descubre tres días después,
-cuando un cliente reclama.
+A company wires Shopify to its ERP, its web forms to a CRM, its billing to accounting. Each
+connection is a URL receiving webhooks. When the destination is down for two minutes, those
+webhooks **don't come back** — the sender retries a couple of times, gives up, and discards
+them. Nobody notices until a customer complains days later.
 
-Lo caro no es la caída de dos minutos. Es que fue **silenciosa**.
+The expensive part is not the two-minute outage. It's that it was **silent**.
 
-## Qué hace Acuse
+## What Acuse does
 
-1. **Recibe y guarda.** El evento se escribe en disco antes de contestarle al que lo mandó.
-   A partir de ahí ya no se puede perder, aunque el destino esté muerto.
-2. **Reintenta solo.** Backoff exponencial con jitter: 5s, 15s, 45s, 2m, 7m, 20m, 1h.
-3. **Avisa antes de que duela.** Si una integración deja de responder, aparece en rojo
-   mientras los eventos todavía se están reintentando — no cuando ya se perdieron.
-4. **Deja reenviar a mano.** El contenido original queda guardado, así que "reenviar" es un
-   botón que funciona y no uno que pide disculpas.
-5. **Muestra el número.** Cuántas entregas fallaron el primer intento y terminaron llegando.
-   Ese es el valor del producto, medido.
+1. **Receive and persist.** The event is written to Postgres before the sender gets its
+   response. From that point on it cannot be lost, even if the destination is dead.
+2. **Retry on its own.** Exponential backoff with jitter: 5s, 15s, 45s, 2m, 7m, 20m, 1h.
+3. **Warn before it hurts.** An integration that stops responding shows up red while its
+   events are still being retried — not after they're gone.
+4. **Replay by hand.** The original payload is kept, so "resend" is a button that works.
+5. **Show the number.** How many deliveries failed on the first attempt and landed anyway.
+   That figure is the product's entire reason to exist, measured.
 
-## Cómo funciona
+## How it works
 
 ```
-  Shopify ─┐
-Formulario ─┼──▶  POST /api/i/<clave>  ──▶  [ Postgres ]  ──▶  worker  ──▶  destino
-Facturación ┘         (202, rápido)          eventos +          (cron)      del cliente
-                                             intentos
+   Shopify ─┐
+ Web forms ─┼──▶  POST /api/i/<key>  ──▶  [ Postgres ]  ──▶  worker  ──▶  customer's
+   Billing ─┘        (202, fast)           events +          (cron)       destination
+                                           attempts
 ```
 
-Decisiones que vale la pena mirar:
+Design decisions worth reading in the code:
 
-**La ingesta no entrega.** El handler de ingesta hace un solo `INSERT` y contesta. No intenta
-la entrega ahí mismo, porque hacer esperar al que manda es exactamente cómo se pierden
-eventos: el sender se cansa de esperar y descarta.
+- **Ingest never delivers inline** — one `INSERT`, then respond. Making the sender wait on a
+  third party is exactly how events get dropped.
+- **Workers claim events with `for update skip locked`**, so several can run in parallel
+  without ever double-sending.
+- **The attempt is recorded before the outcome** — if the process dies mid-delivery, the
+  lease expires and the event is retried. A duplicate is recoverable; a silent loss is not.
+- **Jitter is not decoration** — when a destination comes back up, un-jittered retries would
+  all fire at once and knock it down again.
+- **Outgoing deliveries are signed** (`t=…,v1=HMAC-SHA256(t.body)`, Stripe-style) so the
+  destination can verify origin and reject replays.
+- **Health is derived from the queue**, not from heartbeats: a broken integration reveals
+  itself because events pile up behind it.
 
-**Los workers no se pisan.** Toman eventos con `for update skip locked`, así que se pueden
-correr varios en paralelo y cada uno saltea los que otro ya agarró, en vez de bloquearse.
-Un evento nunca se entrega dos veces por una carrera entre workers.
+## Run it
 
-**El intento se escribe antes que el resultado.** Si el proceso se muere en el medio, el lease
-vence y el evento se reintenta. Una entrega duplicada se arregla; una perdida en silencio no.
-
-**El jitter no es decoración.** Cuando un destino vuelve a funcionar, sin jitter todos los
-eventos encolados contra él salen en el mismo instante y lo tiran de nuevo.
-
-**Se firma lo que sale.** Cada entrega lleva `acuse-signature: t=…,v1=HMAC-SHA256(t.body)`,
-con el timestamp adentro de lo firmado, así una captura vieja no se puede reenviar después.
-
-**La salud sale de la cola.** No hay heartbeat: una integración rota se ve porque los eventos
-se le empiezan a acumular atrás. Es la señal más temprana y no requiere que el destino
-colabore.
-
-## Correrlo
-
-Necesitás Postgres. En local:
+You need Node 20+ and Postgres.
 
 ```bash
-brew services start postgresql@14 && createdb acuse
-```
-
-```bash
-cp .env.example .env.local   # y completá DATABASE_URL
+createdb acuse
+cp .env.example .env.local   # fill in DATABASE_URL
 npm install
-npm run db:reset             # crea las tablas
-npm run seed                 # 3 integraciones de ejemplo
+npm run db:reset             # creates the tables
+npm run seed                 # 3 sample integrations
 npm run dev
 ```
 
-Con el server corriendo, en otra terminal:
+Then, in another terminal, generate believable traffic and watch the dashboard:
 
 ```bash
-npm run simulate -- --events=70 --seconds=110
+npm run simulate -- --events=70 --seconds=140
 ```
 
-El simulador manda tráfico contra las tres integraciones de ejemplo y después procesa la cola
-mientras mirás el panel. Las tres cubren los tres estados que importan: una que anda, una que
-falla y se recupera, y una que está caída.
+The three sample integrations cover the three states that matter: one healthy, one that
+fails and recovers (that one produces the rescued number), and one that is down.
 
-## Desplegarlo
+## Deploy
 
-Anda en Vercel con Postgres administrado (Neon, Supabase o Vercel Postgres). El worker es una
-ruta HTTP, así que se dispara con Vercel Cron:
+Runs on Vercel with any managed Postgres (Neon, Supabase, Vercel Postgres). The worker is an
+HTTP route, so schedule it with Vercel Cron and set `CRON_SECRET`:
 
 ```json
 { "crons": [{ "path": "/api/cron", "schedule": "* * * * *" }] }
 ```
 
-Definí `CRON_SECRET` para que solo el scheduler pueda drenar la cola.
+## Status: v1, single-tenant, eyes open
 
-## Lo que todavía no está
+This is a working v1 that favors honesty over feature count:
 
-Honestidad primero, porque esto es una v1:
+- **No accounts and no login.** Anyone who can reach the console can operate it. Deploy it
+  for yourself, behind your own protection — it is not multi-tenant SaaS yet.
+- **Alerts live on the panel** — no email/Slack notifications yet.
+- **Retries are floor-limited by the cron cadence** (1 minute on Vercel).
+- **No retention policy** — events are kept forever.
+- UI is in Spanish for now.
 
-- **Una sola cuenta.** No hay registro, ni API keys por cliente, ni aislamiento de datos.
-- **El cron corre por minuto.** Es el piso de Vercel; el primer reintento de 5s en la práctica
-  se convierte en "en el próximo minuto".
-- **Las alertas viven en el panel.** Todavía no manda mail ni Slack.
-- **Sin retención.** Los eventos se guardan para siempre; falta política de purga.
-- **UI solo en castellano.** Los textos están concentrados, migrarlos es barato.
+If you need this at company scale today, that category exists commercially (Svix, Hookdeck).
+Acuse is a small, self-hosted, readable take on the same problem.
 
-## Licencia
+## Enjoyed it?
 
-MIT — ver [LICENSE](LICENSE).
+If this was useful and you'd like to support the project:
+
+- [Cafecito](https://cafecito.app/rezamalena)
+- [Ko-fi](https://ko-fi.com/malenitaa)
+
+## License
+
+MIT — see [LICENSE](LICENSE).
