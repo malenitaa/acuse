@@ -18,7 +18,9 @@ English and Spanish; the whole thing runs on your own infrastructure with one
 ![The Acuse console, «instrument» theme: events rescued, integration health, and the full delivery record](docs/img/console-instrument-dark.png)
 
 <details>
-<summary><strong>Same product, other personality: the «ledger» theme</strong></summary>
+<summary><strong>Same product, other personalities: «plano» and «ledger»</strong></summary>
+
+![The Acuse console, «plano» theme: a drafting-table blueprint — deep blue, cyan ink, monospace lettering](docs/img/console-plano-dark.png)
 
 ![The Acuse console, «ledger» theme: a paper ledger on a desk — serif type, ruled sections, rubber-stamp statuses](docs/img/console-ledger-light.png)
 
