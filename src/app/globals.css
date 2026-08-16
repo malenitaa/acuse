@@ -80,6 +80,48 @@
   color-scheme: light;
 }
 
+/* «plano» — the drafting table. By night, a backlit blueprint: deep blue,
+ * cyan ink, monospace titles like drawing labels. Uses the sidebar skeleton:
+ * it is a precision instrument, after all. */
+[data-theme='plano'] {
+  --color-ink: #0b1220;
+  --color-panel: #101a2e;
+  --color-panel-2: #16233c;
+  --color-line: #2b4a73;
+  --color-line-soft: #1a2c49;
+  --color-text: #dbe7f5;
+  --color-muted: #9db4d0;
+  --color-faint: #64809f;
+  --color-good: #3fd68f;
+  --color-warn: #e8b93e;
+  --color-bad: #ff7a6b;
+  --color-accent: #53c2ff;
+
+  /* Titles in monospace: the lettering of a technical drawing. */
+  --font-serif: ui-monospace, 'SF Mono', Menlo, monospace;
+  --radius-ctl: 3px;
+
+  color-scheme: dark;
+}
+
+/* «plano» by day: tracing paper — pale grid, ink-blue lettering. */
+[data-theme='plano'][data-scheme='light'] {
+  --color-ink: #e8eef5;
+  --color-panel: #f7fafd;
+  --color-panel-2: #e3ecf5;
+  --color-line: #a8bfd8;
+  --color-line-soft: #d3e0ee;
+  --color-text: #12294a;
+  --color-muted: #3f5a7d;
+  --color-faint: #7189a6;
+  --color-good: #0f7a4d;
+  --color-warn: #8f6a12;
+  --color-bad: #c03328;
+  --color-accent: #1567c2;
+
+  color-scheme: light;
+}
+
 /* «libro» by night: the same ledger under a desk lamp — dark leather desk,
  * darkened paper, cream ink. */
 [data-theme='libro'][data-scheme='dark'] {

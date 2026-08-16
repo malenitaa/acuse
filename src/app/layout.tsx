@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 // Theme comes from storage; the light/dark scheme falls back to the system
 // preference on first visit. URL params (?theme=libro&scheme=dark) override
 // both — handy for screenshots, demos and support links.
-const themeInit = `try{var d=document.documentElement,q=new URLSearchParams(location.search),t=q.get('theme')||localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'){d.dataset.theme=t}var s=q.get('scheme')||localStorage.getItem('acuse-scheme');if(s!=='light'&&s!=='dark'){s=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}d.dataset.scheme=s}catch(e){}`
+const themeInit = `try{var d=document.documentElement,q=new URLSearchParams(location.search),t=q.get('theme')||localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'||t==='plano'){d.dataset.theme=t}var s=q.get('scheme')||localStorage.getItem('acuse-scheme');if(s!=='light'&&s!=='dark'){s=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}d.dataset.scheme=s}catch(e){}`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLang()

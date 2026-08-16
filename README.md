@@ -60,8 +60,9 @@ complains days later.
 - **Failure alerts as webhooks** — set `ALERT_WEBHOOK_URL` and every event that exhausts
   its retries POSTs a JSON alert there. Point it at a chat webhook, an automation-platform trigger, or
   even another Acuse: delivery failures become one more event your tools can route.
-- **Two themes × light/dark** — a full-width ops console («instrument») or a paper
-  ledger («libro»), each in light and dark, following your system preference. Bilingual
+- **Three themes × light/dark** — a sidebar ops console («instrument»), a drafting-table
+  blueprint («plano»), or a paper ledger («libro»), each in light and dark, following
+  your system preference. Bilingual
   UI (English / Spanish). Choices are remembered.
 
 ## Run it on your own server (recommended)

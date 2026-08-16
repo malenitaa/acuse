@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-const THEME_IDS = ['instrumento', 'libro'] as const
+const THEME_IDS = ['instrumento', 'plano', 'libro'] as const
 
 type ThemeId = (typeof THEME_IDS)[number]
 
@@ -18,7 +18,7 @@ export function ThemeToggle({ labels }: { labels: Record<ThemeId, string> }) {
 
   useEffect(() => {
     const current = document.documentElement.dataset.theme
-    setTheme(current === 'libro' ? 'libro' : 'instrumento')
+    setTheme(THEME_IDS.includes(current as ThemeId) ? (current as ThemeId) : 'instrumento')
   }, [])
 
   function apply(next: ThemeId) {
