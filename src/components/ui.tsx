@@ -117,8 +117,12 @@ export function HealthBadge({
   lang?: Lang
 }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium ${HEALTH_STYLES[health]}`}>
-      <span aria-hidden className="inline-block size-1.5 bg-current" />
+    // items-baseline seats the square on the text baseline like a character;
+    // the extra half pixel down compensates for the optical overshoot of
+    // round lowercase letters (c, a, o dip slightly below the baseline), so
+    // square and word read as vertically level.
+    <span className={`inline-flex items-baseline gap-1.5 text-[12px] font-medium ${HEALTH_STYLES[health]}`}>
+      <span aria-hidden className="inline-block size-1.5 translate-y-[0.5px] bg-current" />
       {dict[lang].health[health]}
     </span>
   )
