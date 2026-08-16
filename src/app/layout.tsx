@@ -42,10 +42,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {themeInit}
         </Script>
         <div className="app-frame">
-          {/* One DOM, two skeletons: «instrumento» renders this aside as a
-              left sidebar (nav on top, preferences at the bottom); «libro»
-              renders it as the book's title page, with the preferences
-              resting on the desk's corner. */}
+          {/* One DOM, two skeletons: «instrumento» and «plano» render this
+              aside as a left sidebar (nav on top, preferences at the bottom);
+              «libro» renders it as the book's title page, preferences printed
+              under the index line. Same order everywhere: brand, nav, prefs. */}
           <aside className="app-side">
             <div className="app-side-top">
               {/* With a client name, the client is the hero and Acuse signs

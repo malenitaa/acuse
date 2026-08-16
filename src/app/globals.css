@@ -315,8 +315,9 @@ body {
   }
 }
 
-/* «libro»: the centered sheet on a desk — a title page instead of a sidebar,
- * and the viewing preferences resting on the desk's top corner. */
+/* «libro»: the centered sheet on a desk, with a title page instead of a
+ * sidebar. The viewing preferences print as a quiet row under the index
+ * line, keeping the same order as the other themes: brand, nav, prefs. */
 [data-theme='libro'] body {
   padding: 1.25rem 0.75rem;
 }
@@ -384,13 +385,13 @@ body {
 }
 
 [data-theme='libro'] .app-side-controls {
-  position: absolute;
-  top: 0.55rem;
-  right: 1.25rem;
-  z-index: 20;
   margin: 0;
+  padding: 0.5rem 0;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
+  border-bottom: 1px solid var(--color-line-soft);
 }
 
 [data-theme='libro'] .app-side-controls .seg {
@@ -399,14 +400,6 @@ body {
 
 [data-theme='libro'] .app-side-controls .seg button {
   flex: none;
-}
-
-@media (max-width: 639px) {
-  [data-theme='libro'] .app-side-controls {
-    position: static;
-    flex-wrap: wrap;
-    padding-bottom: 0.5rem;
-  }
 }
 
 [data-theme='libro'] .app-main {
