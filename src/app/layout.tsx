@@ -48,9 +48,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               resting on the desk's corner. */}
           <aside className="app-side">
             <div className="app-side-top">
+              {/* With a client name, the client is the hero and Acuse signs
+                  small — this is their console, our tool. */}
               <Link href="/" className="app-brand">
-                Acuse
-                {instanceName ? <span className="text-muted"> · {instanceName}</span> : null}
+                {instanceName ? (
+                  <>
+                    {instanceName}
+                    <span className="text-faint"> · Acuse</span>
+                  </>
+                ) : (
+                  'Acuse'
+                )}
               </Link>
               <p className="app-tagline">{t.shell.tagline}</p>
             </div>
