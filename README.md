@@ -66,6 +66,8 @@ docker compose up -d
 The console is at `http://localhost:3000` (or your server's IP). Data survives restarts
 in a Docker volume; `docker compose down` stops everything.
 
+**→ Five-minute guided tour, rescue included: [docs/QUICKSTART.md](docs/QUICKSTART.md)**
+
 - First boot builds the image (a few minutes); after that it starts in seconds.
 - Create integrations from the console (**+ new integration**): give it a name and the
   destination URL, and Acuse hands you the ingest URL to paste into the emitting system
