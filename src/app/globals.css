@@ -37,3 +37,27 @@ body {
 .tnum {
   font-variant-numeric: tabular-nums;
 }
+
+/* Keyboard focus in fountain-pen blue; mouse clicks stay unmarked. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The composition bar draws itself like a rule being traced across the page. */
+@keyframes draw-in {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.draw-in {
+  transform-origin: left;
+  animation: draw-in 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw-in {
+    animation: none;
+  }
+}
