@@ -134,6 +134,19 @@ const es = {
     errorName: 'Poné un nombre para reconocerla.',
     errorDestination: 'La URL de destino no es válida (tiene que ser http o https).',
   },
+  sendEvent: {
+    title: 'Enviar un evento',
+    intro:
+      'Para probar la integración o encolar un aviso a mano. El evento entra a la misma cola que los reales: se entrega, se reintenta si hace falta y queda en el registro.',
+    payloadLabel: 'Payload (JSON)',
+    payloadHelp: 'El cuerpo que va a recibir el destino.',
+    errorJson: 'Eso no es JSON válido.',
+    whenLabel: 'Programar para (opcional)',
+    whenHelp: 'Vacío = se envía ya. Con fecha y hora, espera en cola hasta ese momento (hora del servidor).',
+    errorDate: 'Esa fecha no se entiende.',
+    submit: 'Encolar evento',
+    queued: 'encolado',
+  },
   endpoint: {
     ingestLabel: 'Le pasás esta URL al que manda el webhook',
     deliverLabel: 'Y nosotros entregamos acá',
@@ -270,6 +283,19 @@ const en: typeof es = {
     submit: 'Create integration',
     errorName: 'Give it a name you will recognize.',
     errorDestination: 'The destination URL is not valid (must be http or https).',
+  },
+  sendEvent: {
+    title: 'Send an event',
+    intro:
+      'To test the integration or queue a message by hand. The event joins the same queue as real ones: it gets delivered, retried if needed, and recorded.',
+    payloadLabel: 'Payload (JSON)',
+    payloadHelp: 'The body the destination will receive.',
+    errorJson: 'That is not valid JSON.',
+    whenLabel: 'Schedule for (optional)',
+    whenHelp: 'Empty = sends now. With a date and time, it waits in the queue until then (server time).',
+    errorDate: 'That date does not parse.',
+    submit: 'Queue event',
+    queued: 'queued',
   },
   endpoint: {
     ingestLabel: 'Give this URL to whatever sends the webhook',

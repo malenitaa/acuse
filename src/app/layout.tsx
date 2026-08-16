@@ -29,6 +29,9 @@ const themeInit = `try{var d=document.documentElement,t=localStorage.getItem('ac
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLang()
   const t = dict[lang]
+  // Per-client branding for the one-instance-per-client model:
+  // INSTANCE_NAME="Empresa X" renders as «Acuse · Empresa X».
+  const instanceName = process.env.INSTANCE_NAME
 
   return (
     <html lang={lang} data-theme="instrumento" data-scheme="dark" suppressHydrationWarning>
@@ -47,6 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <header className="app-header">
             <Link href="/" className="app-brand">
               Acuse
+              {instanceName ? <span className="text-muted"> · {instanceName}</span> : null}
             </Link>
             <p className="app-tagline">{t.shell.tagline}</p>
           </header>

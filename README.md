@@ -35,6 +35,10 @@ complains days later.
   exhausted ones, can be redelivered with one click.
 - **Full delivery audit trail** — every attempt is recorded: timestamp, status code,
   response body, duration.
+- **Compose and schedule events** — send a test event to any integration from the
+  console, or queue one for later ("this must go out at 2 am; I want to sleep"). A
+  scheduled send is simply an event whose delivery time hasn't arrived — same queue,
+  same retries, same audit trail.
 - **Signed deliveries, [Standard Webhooks](https://www.standardwebhooks.com) compliant**
   — every request carries `webhook-id`, `webhook-timestamp` and
   `webhook-signature: v1,<base64>` (HMAC-SHA256 over `id.timestamp.body`), so

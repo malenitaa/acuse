@@ -33,6 +33,8 @@ services:
       # Where to POST a JSON alert when an event exhausts its retries
       # (a Slack webhook, an n8n/Albato trigger, or another Acuse):
       # ALERT_WEBHOOK_URL: https://hooks.example.com/acuse-alerts
+      # Per-client branding: the header reads «Acuse · <name>»:
+      # INSTANCE_NAME: Empresa X
     depends_on:
       db:
         condition: service_healthy

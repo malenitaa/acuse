@@ -17,6 +17,7 @@ import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
 import { retryScheduleLabels } from '@/lib/retry'
 import { getEndpoint, listEvents } from '@/lib/stats'
+import { SendEventForm } from './send-event-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,6 +81,14 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
           },
         ]}
       />
+
+      <Section className="px-6 py-5">
+        <h2 className="font-serif text-[16px] font-semibold tracking-tight">
+          {t.sendEvent.title}
+        </h2>
+        <p className="mt-1 max-w-xl text-[12px] leading-relaxed text-muted">{t.sendEvent.intro}</p>
+        <SendEventForm endpointId={endpoint.id} lang={lang} />
+      </Section>
 
       <Section>
         <SectionTitle>{t.endpoint.eventsTitle}</SectionTitle>

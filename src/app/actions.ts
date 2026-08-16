@@ -56,6 +56,45 @@ export async function createEndpointAction(
   redirect(`/endpoints/${id}`)
 }
 
+export type SendEventState = { error?: 'json' | 'date' | 'endpoint' }
+
+/**
+ * Queue an event by hand: for testing an integration, or for scheduling a
+ * webhook ("it should go out at 2am; I want to sleep"). No new machinery —
+ * a scheduled send IS an event whose next_attempt_at hasn't arrived yet,
+ * so the existing queue, retries and audit trail all apply.
+ */
+export async function sendEventAction(
+  _prev: SendEventState,
+  formData: FormData,
+): Promise<SendEventState> {
+  const endpointId = String(formData.get('endpointId') ?? '')
+  if (!endpointId) return { error: 'endpoint' }
+
+  let payload: unknown
+  try {
+    payload = JSON.parse(String(formData.get('payload') ?? ''))
+  } catch {
+    return { error: 'json' }
+  }
+
+  const rawWhen = String(formData.get('scheduledAt') ?? '').trim()
+  let when: Date | null = null
+  if (rawWhen) {
+    when = new Date(rawWhen)
+    if (Number.isNaN(when.getTime())) return { error: 'date' }
+  }
+
+  await query(
+    `insert into events (id, endpoint_id, payload, status, next_attempt_at)
+     values ($1, $2, $3, 'pending', coalesce($4::timestamptz, now()))`,
+    [newId('evt'), endpointId, JSON.stringify(payload), when?.toISOString() ?? null],
+  )
+
+  refresh()
+  return {}
+}
+
 export async function toggleEndpointAction(formData: FormData) {
   const endpointId = String(formData.get('endpointId') ?? '')
   if (endpointId) {
