@@ -20,6 +20,11 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV EMBEDDED_WORKER=1
 ENV PORT=3000
+# Docker sets HOSTNAME to the container id; without this override the Next
+# standalone server binds only to that interface and refuses loopback
+# connections (breaking, e.g., a destination URL that points back at the
+# container itself).
+ENV HOSTNAME=0.0.0.0
 
 # Run as the unprivileged user the base image already ships.
 USER node
