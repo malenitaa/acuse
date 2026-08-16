@@ -1,7 +1,7 @@
 import 'server-only'
-import { createHmac } from 'node:crypto'
 import { query } from './db'
 import { checkDestination } from './destination-guard'
+import { sign } from './signature'
 import { DELIVERY_TIMEOUT_MS, backoffMs } from './retry'
 import type { DeliveryJob, DeliveryResult, EventStatus } from './types'
 
@@ -44,16 +44,6 @@ export async function claimDueEvents(limit: number): Promise<DeliveryJob[]> {
                ep.max_attempts`,
     [limit],
   )
-}
-
-/**
- * Sign the body so the destination can prove the request came from us and was
- * not replayed. Same scheme Stripe uses: the timestamp is inside the signed
- * material, so an old capture cannot be re-sent later.
- */
-function sign(secret: string, timestamp: number, body: string): string {
-  const digest = createHmac('sha256', secret).update(`${timestamp}.${body}`).digest('hex')
-  return `t=${timestamp},v1=${digest}`
 }
 
 /** One HTTP request to the destination. Never throws. */

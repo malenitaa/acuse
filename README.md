@@ -146,6 +146,14 @@ and recovers — producing the rescued count — and one that's down):
 npm run simulate -- --events=70 --seconds=140
 ```
 
+Unit tests cover the core guarantees — backoff bounds and schedule, HMAC signing and
+verification, destination guarding, rate limiting, and i18n parity — using Node's
+built-in test runner (zero extra dependencies):
+
+```bash
+npm test
+```
+
 </details>
 
 ## FAQ
