@@ -31,8 +31,9 @@ de que se pierda algo. Y te muestra el número que importa: cuántos avisos resc
   o caída.
 - **El registro completo** — cada evento con todos sus intentos: cuándo, qué respondió el
   destino, cuánto tardó. Si algo agotó los reintentos, un botón lo reenvía a mano.
-- **Dos temas a elección** (arriba a la derecha): «instrumento», una consola oscura a
-  pantalla completa, o «libro», un libro contable en papel. El panel recuerda tu elección.
+- **Dos temas a elección** (arriba a la derecha): «instrumento», una consola a pantalla
+  completa, o «libro», un libro contable. Cada uno en **modo claro u oscuro** — arranca
+  siguiendo la preferencia de tu sistema. El panel recuerda tus elecciones.
 - **Dos idiomas**: la interfaz habla inglés (por defecto) y castellano, con un selector
   en el header. La elección también se recuerda.
 

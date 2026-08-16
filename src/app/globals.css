@@ -36,6 +36,31 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/*
+ * Personality and light are independent axes: data-theme picks the skeleton
+ * and voice, data-scheme (light/dark, seeded from the system preference)
+ * picks the palette family. Four combinations, all from the same tokens.
+ */
+
+/* «instrumento» in daylight: the light console (GitHub/Stripe daylight look). */
+[data-scheme='light'] {
+  --color-ink: #f4f6f9;
+  --color-panel: #ffffff;
+  --color-panel-2: #eef1f5;
+  --color-line: #d0d7de;
+  --color-line-soft: #e6eaf0;
+  --color-text: #1f2328;
+  --color-muted: #57606a;
+  --color-faint: #848d97;
+  --color-good: #1a7f37;
+  --color-warn: #9a6700;
+  --color-bad: #cf222e;
+  --color-accent: #0969da;
+
+  color-scheme: light;
+}
+
+/* «libro» by day: the paper ledger. */
 [data-theme='libro'] {
   --color-ink: #ddd3bd; /* desk: what shows around the sheet */
   --color-panel: #f9f6ee; /* the sheet itself */
@@ -51,14 +76,31 @@
   --color-accent: #2a4d78; /* fountain-pen blue */
 
   --font-serif: 'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif;
+
+  color-scheme: light;
+}
+
+/* «libro» by night: the same ledger under a desk lamp — dark leather desk,
+ * darkened paper, cream ink. */
+[data-theme='libro'][data-scheme='dark'] {
+  --color-ink: #131009;
+  --color-panel: #1f1a12;
+  --color-panel-2: #292217;
+  --color-line: #6d6248;
+  --color-line-soft: #3a3226;
+  --color-text: #e8e0cd;
+  --color-muted: #b3a88e;
+  --color-faint: #7d745e;
+  --color-good: #6fb08b;
+  --color-warn: #d0a53f;
+  --color-bad: #d96b5c;
+  --color-accent: #7fa3cc;
+
+  color-scheme: dark;
 }
 
 html {
   color-scheme: dark;
-}
-
-[data-theme='libro'] {
-  color-scheme: light;
 }
 
 body {
@@ -142,7 +184,15 @@ body {
   column-gap: 1rem;
   row-gap: 0.25rem;
   border-bottom: 1px solid var(--color-line);
-  padding: 0.75rem 15rem 0.75rem 1.5rem;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Only when the controls float in the corner does the bar need to keep its
+ * right side clear for them. */
+@media (min-width: 640px) {
+  .app-header {
+    padding-right: 22rem;
+  }
 }
 
 .app-brand {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Script from 'next/script'
 import { LangToggle } from '@/components/lang-toggle'
+import { SchemeToggle } from '@/components/scheme-toggle'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
@@ -21,14 +22,16 @@ export async function generateMetadata(): Promise<Metadata> {
 // Runs once from the raw HTML, before paint and before hydration. React warns
 // in dev that it will never re-execute this on client renders — that is the
 // point: it must run exactly once, first. (Same pattern as next-themes.)
-const themeInit = `try{var t=localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'){document.documentElement.dataset.theme=t}}catch(e){}`
+// Theme comes from storage; the light/dark scheme falls back to the system
+// preference on first visit.
+const themeInit = `try{var d=document.documentElement,t=localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'){d.dataset.theme=t}var s=localStorage.getItem('acuse-scheme');if(s!=='light'&&s!=='dark'){s=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}d.dataset.scheme=s}catch(e){}`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getLang()
   const t = dict[lang]
 
   return (
-    <html lang={lang} data-theme="instrumento" suppressHydrationWarning>
+    <html lang={lang} data-theme="instrumento" data-scheme="dark" suppressHydrationWarning>
       <body>
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInit}
@@ -37,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             the theme draws — same screen corner in both themes. */}
         <div className="app-controls">
           <ThemeToggle labels={t.shell.themeNames} />
+          <SchemeToggle />
           <LangToggle current={lang} />
         </div>
         <div className="app-frame">
