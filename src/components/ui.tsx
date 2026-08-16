@@ -108,27 +108,7 @@ export function HealthBadge({ health }: { health: EndpointHealth['health'] }) {
   )
 }
 
-export function SubmitButton({
-  children,
-  variant = 'ghost',
-}: {
-  children: React.ReactNode
-  variant?: 'ghost' | 'primary'
-}) {
-  const variantClass =
-    variant === 'primary'
-      ? 'border-text font-semibold text-text hover:bg-text hover:text-panel'
-      : 'border-line text-muted hover:border-text hover:text-text'
-
-  return (
-    <button
-      type="submit"
-      className={`cursor-pointer border px-3 py-1 text-[12px] transition ${variantClass}`}
-    >
-      {children}
-    </button>
-  )
-}
+export { SubmitButton } from './submit-button'
 
 /** Thin navigation strip at the top of inner pages. */
 export function BackStrip({ href, children }: { href: string; children: React.ReactNode }) {
