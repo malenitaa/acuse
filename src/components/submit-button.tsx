@@ -28,7 +28,7 @@ export function SubmitButton({
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className={`cursor-pointer border px-3 py-1 text-[12px] transition disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-text ${variantClass}`}
+      className={`cursor-pointer border px-3 py-1 text-[12px] transition active:scale-[0.98] disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-text ${variantClass}`}
     >
       {pending ? <span className="italic">{pendingLabel}</span> : children}
     </button>
