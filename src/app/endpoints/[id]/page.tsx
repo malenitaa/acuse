@@ -49,12 +49,17 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
               <HealthBadge health={endpoint.health} lang={lang} />
             </div>
           </div>
-          <form action={toggleEndpointAction}>
-            <input type="hidden" name="endpointId" value={endpoint.id} />
-            <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.actions.done}>
-              {endpoint.paused ? t.actions.resume : t.actions.pause}
-            </SubmitButton>
-          </form>
+          <div className="flex max-w-[240px] flex-col items-end gap-1.5">
+            <form action={toggleEndpointAction}>
+              <input type="hidden" name="endpointId" value={endpoint.id} />
+              <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.actions.done}>
+                {endpoint.paused ? t.actions.resume : t.actions.pause}
+              </SubmitButton>
+            </form>
+            <p className="text-right text-[11px] leading-relaxed text-faint">
+              {endpoint.paused ? t.endpoint.pausedHelp : t.endpoint.pauseHelp}
+            </p>
+          </div>
         </div>
 
         <div className="mt-5 space-y-3">

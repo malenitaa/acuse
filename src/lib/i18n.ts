@@ -175,6 +175,8 @@ const es = {
     secretLabel: 'Secreto de firma',
     secretHelp:
       'Con esto el destino verifica que cada entrega salió de acá (firma Standard Webhooks). Compartilo solo con quien recibe.',
+    pauseHelp: 'Pausar no rechaza nada: los eventos siguen llegando y guardándose, solo se frena la entrega.',
+    pausedHelp: 'En pausa: los eventos siguen llegando y guardándose. Se entregan todos al reanudar.',
     retrySentence: (max: number, schedule: string) =>
       `Si el destino no contesta, reintentamos ${max} veces separando cada intento: ${schedule}. Después queda marcado como sin entregar y esperando a una persona.`,
     received: 'Recibidos',
@@ -350,6 +352,8 @@ const en: typeof es = {
     secretLabel: 'Signing secret',
     secretHelp:
       'The destination uses this to verify that each delivery really came from here (Standard Webhooks signature). Share it only with the receiving side.',
+    pauseHelp: 'Pausing rejects nothing: events keep arriving and being stored, only delivery stops.',
+    pausedHelp: 'Paused: events keep arriving and being stored. They are all delivered when you resume.',
     retrySentence: (max: number, schedule: string) =>
       `If the destination does not answer, we retry ${max} times, spacing the attempts: ${schedule}. After that the event is marked undelivered, waiting for a human.`,
     received: 'Received',
