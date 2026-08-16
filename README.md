@@ -58,9 +58,9 @@ The console is at `http://localhost:3000` (or your server's IP). Data survives r
 in a Docker volume; `docker compose down` stops everything.
 
 - First boot builds the image (a few minutes); after that it starts in seconds.
-- Integrations are created with a row in the `endpoints` table for now (an admin screen
-  is on the roadmap) — `scripts/seed.mts` shows the shape, and
-  `docker compose exec db psql -U acuse` gets you a prompt.
+- Create integrations from the console (**+ new integration**): give it a name and the
+  destination URL, and Acuse hands you the ingest URL to paste into the emitting system
+  (Albato, Shopify, Stripe, a form backend…) in place of the direct destination.
 - To expose it beyond your network, put a domain with HTTPS in front (Caddy, nginx);
   for internal use, the IP is enough.
 

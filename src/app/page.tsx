@@ -68,15 +68,23 @@ export default async function DashboardPage() {
       <Section>
         <SectionTitle
           aside={
-            <form action={processQueueAction}>
-              <SubmitButton
-                variant="primary"
-                pendingLabel={t.actions.processing}
-                doneLabel={t.actions.recorded}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Link
+                href="/endpoints/new"
+                className="text-[12px] text-accent transition-colors hover:text-text"
               >
-                {t.actions.processQueue}
-              </SubmitButton>
-            </form>
+                {t.newEndpoint.dashboardLink}
+              </Link>
+              <form action={processQueueAction}>
+                <SubmitButton
+                  variant="primary"
+                  pendingLabel={t.actions.processing}
+                  doneLabel={t.actions.recorded}
+                >
+                  {t.actions.processQueue}
+                </SubmitButton>
+              </form>
+            </div>
           }
         >
           {t.dashboard.integrations}
