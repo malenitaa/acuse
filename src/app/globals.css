@@ -270,6 +270,48 @@ body {
   padding: 1rem 1.5rem;
 }
 
+/* ---------- Control finish: each theme polishes in its own language ------
+ * «instrumento» rounds its controls softly and fills its status chips (the
+ * modern SaaS finish); «libro» stays square with outlined rubber stamps —
+ * a ledger with pastel chips would stop being a ledger. */
+
+:root {
+  --radius-ctl: 6px;
+}
+
+[data-theme='libro'] {
+  --radius-ctl: 0px;
+}
+
+.seg {
+  border-radius: var(--radius-ctl);
+  overflow: hidden;
+}
+
+.seg button {
+  border-radius: 0;
+}
+
+button,
+input,
+textarea {
+  border-radius: var(--radius-ctl);
+}
+
+/* Status chips: filled softly from their own color in «instrumento»,
+ * outlined stamps in «libro». */
+.pill {
+  border-radius: 999px;
+  border-color: transparent;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+[data-theme='libro'] .pill {
+  border-radius: 0;
+  border-color: color-mix(in srgb, currentColor 70%, transparent);
+  background: transparent;
+}
+
 /* ---------- Shared details ---------- */
 
 /* Numbers that change should not make the layout twitch. */

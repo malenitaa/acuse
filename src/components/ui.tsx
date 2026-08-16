@@ -95,7 +95,7 @@ export function StatusPill({
 
   return (
     <span
-      className={`inline-flex items-center border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.1em] ${STATUS_STYLES[status]}`}
+      className={`pill inline-flex items-center border px-2 py-px font-mono text-[10px] uppercase tracking-[0.1em] ${STATUS_STYLES[status]}`}
     >
       {label}
     </span>
