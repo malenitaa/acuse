@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { processQueueAction } from './actions'
+import { AutoRefresh } from '@/components/auto-refresh'
 import {
   Empty,
   HealthBadge,
@@ -28,6 +29,7 @@ export default async function DashboardPage() {
 
   return (
     <Sheet>
+      <AutoRefresh />
       <Headline stats={stats} />
 
       {broken.length > 0 ? <MarginNote names={broken.map((e) => e.name)} /> : null}
@@ -71,7 +73,8 @@ export default async function DashboardPage() {
             No hay integraciones todavía. Corré <code className="font-mono">npm run seed</code>.
           </Empty>
         ) : (
-          <table className="w-full text-[13px]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
             <thead className="text-[11px] uppercase tracking-[0.08em] text-faint">
               <tr className="border-b border-line-soft">
                 <th className="px-6 py-2 text-left font-medium">Nombre</th>
@@ -86,7 +89,7 @@ export default async function DashboardPage() {
               {endpoints.map((endpoint) => (
                 <tr
                   key={endpoint.id}
-                  className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
+                  className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
                 >
                   <td className="px-6 py-2.5">
                     <Link href={`/endpoints/${endpoint.id}`} className="hover:text-accent">
@@ -116,7 +119,8 @@ export default async function DashboardPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Section>
 
@@ -136,12 +140,13 @@ export default async function DashboardPage() {
             <code className="font-mono">npm run simulate</code>.
           </Empty>
         ) : (
-          <table className="w-full text-[13px]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
             <tbody>
               {events.map((event) => (
                 <tr
                   key={event.id}
-                  className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
+                  className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
                 >
                   <td className="px-6 py-2.5">
                     <Link
@@ -166,7 +171,8 @@ export default async function DashboardPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Section>
     </Sheet>
@@ -208,7 +214,7 @@ function CompositionBar({ stats }: { stats: Stats }) {
 
   return (
     <div className="mt-5 max-w-xl">
-      <div className="flex h-2 border border-line-soft bg-panel-2">
+      <div className="draw-in flex h-2 border border-line-soft bg-panel-2">
         {segments.map((segment) => (
           <div
             key={segment.key}
