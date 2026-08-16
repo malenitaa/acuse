@@ -1,12 +1,12 @@
 'use server'
 
-import { randomBytes } from 'node:crypto'
 import { refresh } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { query } from '@/lib/db'
 import { drainQueue, replayEvent } from '@/lib/delivery'
 import { checkDestination } from '@/lib/destination-guard'
 import { newId } from '@/lib/ids'
+import { newSigningSecret } from '@/lib/signature'
 
 /**
  * In production the scheduler drains the queue. The console keeps a button for
@@ -50,7 +50,7 @@ export async function createEndpointAction(
   await query(
     `insert into endpoints (id, name, ingest_key, destination_url, signing_secret, max_attempts)
      values ($1, $2, $3, $4, $5, $6)`,
-    [id, name, newId('ik', 20), destination, randomBytes(24).toString('hex'), maxAttempts],
+    [id, name, newId('ik', 20), destination, newSigningSecret(), maxAttempts],
   )
 
   redirect(`/endpoints/${id}`)

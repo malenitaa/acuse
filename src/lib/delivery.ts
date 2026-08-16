@@ -70,9 +70,11 @@ async function sendOnce(job: DeliveryJob, attemptNumber: number) {
       headers: {
         'content-type': 'application/json',
         'user-agent': 'Acuse/0.1',
-        'acuse-event-id': job.id,
+        // Standard Webhooks headers: verifiable with any compliant library.
+        'webhook-id': job.id,
+        'webhook-timestamp': String(timestamp),
+        'webhook-signature': sign(job.signing_secret, job.id, timestamp, body),
         'acuse-attempt': String(attemptNumber),
-        'acuse-signature': sign(job.signing_secret, timestamp, body),
       },
       body,
       signal: AbortSignal.timeout(DELIVERY_TIMEOUT_MS),

@@ -35,9 +35,11 @@ complains days later.
   exhausted ones, can be redelivered with one click.
 - **Full delivery audit trail** — every attempt is recorded: timestamp, status code,
   response body, duration.
-- **Signed deliveries** — each outgoing request carries
-  `t=…,v1=HMAC-SHA256(t.body)` (the same scheme Stripe uses) so destinations can verify
-  origin and reject replays.
+- **Signed deliveries, [Standard Webhooks](https://www.standardwebhooks.com) compliant**
+  — every request carries `webhook-id`, `webhook-timestamp` and
+  `webhook-signature: v1,<base64>` (HMAC-SHA256 over `id.timestamp.body`), so
+  destinations can verify origin and reject replays using any Standard Webhooks
+  library — Svix's SDKs included.
 - **Failure alerts as webhooks** — set `ALERT_WEBHOOK_URL` and every event that exhausts
   its retries POSTs a JSON alert there. Point it at Slack, an n8n or Albato trigger, or
   even another Acuse: delivery failures become one more event your tools can route.
@@ -109,8 +111,11 @@ Two patterns worth knowing:
   Basic Auth (the ingest endpoint stays public by design — that's where webhooks
   arrive). Without it the console is open: fine for a laptop demo, not for an exposed
   deployment.
-- **Signed outbound deliveries** (HMAC-SHA256 with the timestamp inside the signed
-  material, anti-replay).
+- **Signed outbound deliveries** implementing the
+  [Standard Webhooks](https://www.standardwebhooks.com) spec (HMAC-SHA256 over
+  `id.timestamp.body`, `whsec_` secrets, anti-replay tolerance window) — verifiable
+  with any compliant library, or with the `verifySignature` helper in
+  [`src/lib/signature.ts`](src/lib/signature.ts).
 - **Rate-limited ingestion** (per-key, 600 req/min by default, `429 + Retry-After` —
   configurable via `INGEST_MAX_PER_MINUTE`).
 - **Destination guard**: only `http(s)` destinations; set `BLOCK_PRIVATE_DESTINATIONS=1`
