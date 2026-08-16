@@ -92,8 +92,8 @@ function verify(secret, headers, rawBody, toleranceSeconds = 300) {
 }
 ```
 
-The signing secret of each integration lives in the `endpoints` table
-(`docker compose exec db psql -U acuse -c "select name, signing_secret from endpoints"`).
+Each integration's signing secret is on its page in the console, under
+**Signing secret**: masked by default, with **Reveal** and **Copy** buttons.
 
 ## Where to go next
 
