@@ -62,9 +62,64 @@ html {
 }
 
 body {
+  position: relative; /* anchors .app-controls to the viewport top corner */
   background: var(--color-ink);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Viewing preferences (theme + language) ---------- */
+
+/* One fixed corner in BOTH themes: the controls belong to the desk, not to
+ * the sheet or the console bar, so switching themes never moves them. */
+.app-controls {
+  position: absolute;
+  top: 0.55rem;
+  right: 1.25rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Segmented control: bordered group, filled active segment — reads as a
+ * control, not as small text. */
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  background: var(--color-panel);
+}
+
+.seg button {
+  padding: 3px 9px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-faint);
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.seg button:hover {
+  color: var(--color-muted);
+}
+
+.seg button + button {
+  border-left: 1px solid var(--color-line-soft);
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--color-panel-2);
+  color: var(--color-text);
+}
+
+/* On phones the corner is too crowded: the controls become a slim row in the
+ * normal flow, above everything. */
+@media (max-width: 639px) {
+  .app-controls {
+    position: static;
+    justify-content: flex-end;
+    padding: 0.6rem 0.75rem 0;
+  }
 }
 
 /* ---------- App shell: console vs. sheet ---------- */
@@ -81,11 +136,13 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  column-gap: 1.5rem;
+  /* Brand and tagline sit together on the left; the right side stays clear
+   * for the overlaid .app-controls. */
+  justify-content: flex-start;
+  column-gap: 1rem;
   row-gap: 0.25rem;
   border-bottom: 1px solid var(--color-line);
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 15rem 0.75rem 1.5rem;
 }
 
 .app-brand {
@@ -140,6 +197,7 @@ body {
 
 [data-theme='libro'] .app-header {
   align-items: baseline;
+  justify-content: space-between;
   border-bottom: 3px double var(--color-line);
   padding: 1.25rem 1.5rem;
 }

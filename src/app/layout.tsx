@@ -33,16 +33,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInit}
         </Script>
+        {/* Viewing preferences live on the "desk", outside whichever skeleton
+            the theme draws — same screen corner in both themes. */}
+        <div className="app-controls">
+          <ThemeToggle labels={t.shell.themeNames} />
+          <LangToggle current={lang} />
+        </div>
         <div className="app-frame">
           <header className="app-header">
             <Link href="/" className="app-brand">
               Acuse
             </Link>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-              <p className="app-tagline">{t.shell.tagline}</p>
-              <ThemeToggle labels={t.shell.themeNames} />
-              <LangToggle current={lang} />
-            </div>
+            <p className="app-tagline">{t.shell.tagline}</p>
           </header>
           <main className="app-main">{children}</main>
           <footer className="app-footer">
