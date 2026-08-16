@@ -1,53 +1,52 @@
 # Acuse
 
-Guardián de webhooks: ningún evento se pierde.
-*Webhook delivery guardian for self-hosting — no event gets lost. Bilingual UI (EN/ES).*
+**Self-hosted webhook gateway: no event gets lost.**
 
----
+[![CI](https://github.com/malenitaa/acuse/actions/workflows/ci.yml/badge.svg)](https://github.com/malenitaa/acuse/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## ¿Qué es esto?
+Acuse sits between the systems that emit webhooks and the systems that must receive them.
+Every event is persisted before the sender gets an answer, failed deliveries are retried
+automatically with exponential backoff, exhausted ones land in a dead-letter state with
+one-click replay, and a dashboard shows the number that matters: **how many deliveries
+were rescued** that would otherwise have been silently lost.
 
-Cuando los sistemas de una empresa se hablan entre sí, lo hacen mandándose avisos
-automáticos: la tienda online le avisa al sistema de facturación que hubo una venta, el
-formulario de la web le avisa al CRM que entró un cliente, el sistema de cobros le avisa a
-contabilidad. Esos avisos se llaman **webhooks**.
+*Acuse* is Spanish for *acuse de recibo* — acknowledgment of receipt. The UI speaks
+English and Spanish; the whole thing runs on your own infrastructure with one
+`docker compose up`.
 
-El problema: si el sistema que recibe el aviso está caído aunque sea dos minutos —un
-reinicio, una actualización, un proveedor con problemas— **el aviso se pierde y nadie se
-entera**. La venta no se factura, el cliente no aparece en el CRM. Te enterás días después,
-cuando alguien reclama.
+## The problem
 
-**Acuse se pone en el medio y hace de escribano**: recibe cada aviso, lo guarda antes que
-nada, insiste hasta entregarlo (esperando un poco más entre cada intento), y deja
-constancia de todo. Si un destino está caído un rato largo, el panel te lo marca *antes*
-de que se pierda algo. Y te muestra el número que importa: cuántos avisos rescató que sin
-él se perdían en silencio.
+Companies wire their online store to an ERP, web forms to a CRM, billing to accounting.
+Each connection is a URL receiving webhooks. When a destination is down for two minutes —
+a restart, a deploy, a provider hiccup — those webhooks don't come back: the sender
+retries a few times, gives up, and discards them. The failure is silent. The sale never
+gets invoiced, the lead never reaches the CRM, and nobody notices until a customer
+complains days later.
 
-## Qué vas a ver en el panel
+## What you get
 
-- **Eventos rescatados** — el número grande: entregas que fallaron al primer intento y
-  llegaron igual gracias a los reintentos.
-- **Integraciones** — cada conexión (ej.: "Shopify → ERP") con su estado: sana, inestable
-  o caída.
-- **El registro completo** — cada evento con todos sus intentos: cuándo, qué respondió el
-  destino, cuánto tardó. Si algo agotó los reintentos, un botón lo reenvía a mano.
-- **Dos temas a elección** (arriba a la derecha): «instrumento», una consola a pantalla
-  completa, o «libro», un libro contable. Cada uno en **modo claro u oscuro** — arranca
-  siguiendo la preferencia de tu sistema. El panel recuerda tus elecciones.
-- **Dos idiomas**: la interfaz habla inglés (por defecto) y castellano, con un selector
-  en el header. La elección también se recuerda.
+- **Durable ingestion** — events are written to Postgres *before* the sender is answered.
+  From that point on they cannot be lost, even if the destination is down for a day.
+- **Automatic retries** — exponential backoff with jitter: 5s, 15s, 45s, 2m, 7m, 20m, 1h.
+- **Early failure detection** — an integration that stops responding is flagged on the
+  dashboard while its events are still being retried, before anything is lost.
+- **Dead-letter queue with replay** — original payloads are kept, so any event, including
+  exhausted ones, can be redelivered with one click.
+- **Full delivery audit trail** — every attempt is recorded: timestamp, status code,
+  response body, duration.
+- **Signed deliveries** — each outgoing request carries
+  `t=…,v1=HMAC-SHA256(t.body)` (the same scheme Stripe uses) so destinations can verify
+  origin and reject replays.
+- **Two themes × light/dark** — a full-width ops console («instrument») or a paper
+  ledger («libro»), each in light and dark, following your system preference. Bilingual
+  UI (English / Spanish). Choices are remembered.
 
-## Instalarlo en tu empresa
+## Run it on your own server (recommended)
 
-Hay dos caminos. El recomendado es el primero: acuse corre **en tus propias máquinas**,
-sin depender de ninguna plataforma, sin comprar dominios y sin que los datos salgan de tu
-red.
-
-### Opción A — En tu propia máquina o servidor (recomendada)
-
-Lo único que hace falta es [Docker](https://www.docker.com/products/docker-desktop/)
-(gratis), que es una forma estándar de correr programas empaquetados. Después, en una
-terminal:
+All you need is [Docker](https://www.docker.com/products/docker-desktop/). One command
+brings up the app, its Postgres database and the retry worker — no external scheduler,
+no platform account, and your webhook data never leaves your network:
 
 ```bash
 git clone https://github.com/malenitaa/acuse.git
@@ -55,132 +54,122 @@ cd acuse
 docker compose up -d
 ```
 
-Eso levanta **todo**: la aplicación, su base de datos y el motor de reintentos, en un
-solo comando. El panel queda en `http://localhost:3000` (o la IP del servidor donde lo
-corras). Los datos viven en un volumen de Docker y sobreviven reinicios; para apagarlo,
-`docker compose down`.
+The console is at `http://localhost:3000` (or your server's IP). Data survives restarts
+in a Docker volume; `docker compose down` stops everything.
 
-- La primera vez tarda unos minutos (construye la imagen); después arranca en segundos.
-- Las integraciones se dan de alta con una fila en la base (ver paso 6 de la opción B —
-  aplica igual acá, con `docker compose exec db psql -U acuse`).
-- Para exponerlo fuera de tu red vas a querer un dominio y HTTPS adelante (Caddy o
-  nginx); para uso interno, la IP alcanza.
-
-### Opción B — En la nube con Vercel
-
-Si preferís no administrar ningún servidor, se puede desplegar en Vercel con una base
-Neon. No hace falta ser programador, pero sí animarse a seguir pasos en pantallas
-nuevas — o pedirle 30 minutos a la persona de sistemas. Todo tiene capa gratuita.
-
-**Vas a necesitar:**
-
-1. Una cuenta en [GitHub](https://github.com) (donde vive este código).
-2. Una cuenta en [Vercel](https://vercel.com) (la plataforma que ejecuta la aplicación).
-3. Una cuenta en [Neon](https://neon.tech) (la base de datos donde se guardan los eventos).
-
-**Pasos:**
-
-1. **Copiá el proyecto**: arriba a la derecha en esta página, botón **Fork**. Eso crea tu
-   propia copia del código.
-2. **Creá la base de datos**: en Neon, "New project", elegí la región más cercana y
-   copiá la dirección de conexión (empieza con `postgresql://`). Esa dirección funciona
-   como una contraseña: no la compartas.
-3. **Cargá el esquema**: en Neon, abrí el "SQL Editor", pegá el contenido del archivo
-   [`db/schema.sql`](db/schema.sql) de este proyecto y ejecutalo. Eso crea las tablas
-   donde vive todo.
-4. **Desplegá en Vercel**: "Add New → Project", elegí tu copia de acuse, y antes de
-   confirmar agregá dos variables de entorno:
-   - `DATABASE_URL` → la dirección de Neon del paso 2.
-   - `CRON_SECRET` → una clave larga inventada por vos (protege el motor de reintentos).
-5. **Listo.** Vercel te da una dirección (`tuempresa-acuse.vercel.app`). Ahí está tu
-   panel, y el motor de reintentos queda programado solo (viene definido en
-   [`vercel.json`](vercel.json)).
-6. **Cargá tus integraciones**: por ahora se dan de alta con una fila en la base (no hay
-   pantalla de alta todavía — está en la lista de pendientes). En el SQL Editor de Neon,
-   un `INSERT` en la tabla `endpoints` (el script [`scripts/seed.mts`](scripts/seed.mts)
-   sirve de ejemplo), o pedíselo a la persona técnica: cada integración define a qué URL
-   entregar y obtiene su
-   dirección de ingreso `https://tu-acuse.vercel.app/api/i/<clave>` para pegar en el
-   sistema que manda los avisos.
-
-> **Importante sobre seguridad:** esta versión no tiene usuarios ni contraseña — cualquiera
-> que conozca la dirección puede ver y operar el panel. Para uso real, activá la protección
-> de acceso de Vercel (Settings → Deployment Protection) o ponelo detrás del sistema de
-> acceso que use tu empresa.
+- First boot builds the image (a few minutes); after that it starts in seconds.
+- Integrations are created with a row in the `endpoints` table for now (an admin screen
+  is on the roadmap) — `scripts/seed.mts` shows the shape, and
+  `docker compose exec db psql -U acuse` gets you a prompt.
+- To expose it beyond your network, put a domain with HTTPS in front (Caddy, nginx);
+  for internal use, the IP is enough.
 
 <details>
-<summary><strong>Para la persona técnica: correrlo local y generar tráfico de prueba</strong></summary>
+<summary><strong>Deploy to Vercel instead</strong></summary>
 
-Requiere Node 20+ y Postgres.
+If you'd rather not run a server: fork this repo, create a Postgres database
+([Neon](https://neon.tech) free tier works), run [`db/schema.sql`](db/schema.sql) in its
+SQL editor, then import the fork in Vercel with two environment variables:
+
+- `DATABASE_URL` — the Neon connection string.
+- `CRON_SECRET` — a long random string protecting the retry worker.
+
+The retry schedule ships in [`vercel.json`](vercel.json) (Vercel Cron hits `/api/cron`
+every minute). On serverless the embedded worker stays off — the platform's cron does
+the ticking.
+
+</details>
+
+## Security
+
+- **Optional console lock**: set `CONSOLE_PASSWORD` and the dashboard requires HTTP
+  Basic Auth (the ingest endpoint stays public by design — that's where webhooks
+  arrive). Without it the console is open: fine for a laptop demo, not for an exposed
+  deployment.
+- **Signed outbound deliveries** (HMAC-SHA256 with the timestamp inside the signed
+  material, anti-replay).
+- **Rate-limited ingestion** (per-key, 600 req/min by default, `429 + Retry-After` —
+  configurable via `INGEST_MAX_PER_MINUTE`).
+- **Destination guard**: only `http(s)` destinations; set `BLOCK_PRIVATE_DESTINATIONS=1`
+  to refuse loopback/private/link-local addresses if untrusted operators can create
+  endpoints (SSRF hardening).
+- **Baseline security headers** (`nosniff`, `X-Frame-Options: DENY`, referrer and
+  permissions policies), constant-time secret comparisons, 1 MB body cap.
+- Zero `npm audit` vulnerabilities at the time of writing; CI runs typecheck + build on
+  every push.
+
+## How it works
+
+```
+   Store    ─┐
+ Web forms  ─┼──▶  POST /api/i/<key>  ──▶  [ Postgres ]  ──▶  worker  ──▶  destination
+   Billing  ─┘        (202, fast)           events +          (30s tick
+                                            attempts           or cron)
+```
+
+Design decisions worth reading in the code:
+
+- Ingestion never delivers inline — one `INSERT`, then respond. Making the sender wait
+  on a third party is how events get dropped.
+- Workers claim events with `FOR UPDATE SKIP LOCKED`, so several can run in parallel
+  without double-sending. The embedded worker (`EMBEDDED_WORKER=1`, default in Docker)
+  ticks inside the app process; on Vercel, platform cron does it.
+- The attempt record is written before the event outcome. If the process dies
+  mid-delivery, the lease expires and the event is retried: a duplicate is recoverable,
+  a silent loss is not.
+- Retry jitter prevents a recovered destination from being knocked down again by a
+  simultaneous burst of queued events.
+- Endpoint health is derived from the queue rather than from heartbeats: a broken
+  integration reveals itself because events pile up behind it.
+
+Stack: Next.js 16, React 19, Tailwind 4 (design tokens, container queries, zero UI
+libraries), Postgres via `pg`. Single-tenant by design.
+
+<details>
+<summary><strong>Local development</strong></summary>
+
+Requires Node 20+ and Postgres.
 
 ```bash
 createdb acuse
-cp .env.example .env.local   # setear DATABASE_URL
+cp .env.example .env.local   # set DATABASE_URL
 npm install
-npm run db:reset             # crea el esquema
-npm run seed                 # tres integraciones de ejemplo
+npm run db:reset             # create the schema
+npm run seed                 # three sample integrations
 npm run dev
 ```
 
-Tráfico realista contra las integraciones de ejemplo (una sana, una que falla y se
-recupera, una caída — los tres estados que el panel tiene que saber contar):
+Generate realistic traffic against the samples (one healthy destination, one that fails
+and recovers — producing the rescued count — and one that's down):
 
 ```bash
 npm run simulate -- --events=70 --seconds=140
 ```
 
-El motor de reintentos tiene dos modos: con `EMBEDDED_WORKER=1` (el default de la imagen
-Docker) corre adentro del proceso, un pase cada 30 segundos — sin scheduler externo. En
-Vercel, donde el proceso no persiste, el mismo pase lo dispara Vercel Cron cada minuto
-contra `/api/cron`, protegido por `CRON_SECRET`. Ambos modos son concurrentes-seguros:
-los eventos se toman con `FOR UPDATE SKIP LOCKED`.
-
 </details>
 
-<details>
-<summary><strong>Para la persona técnica: cómo funciona por dentro</strong></summary>
+## FAQ
 
-```
-   Shopify ─┐
- Web forms ─┼──▶  POST /api/i/<key>  ──▶  [ Postgres ]  ──▶  worker  ──▶  destino
-   Cobros  ─┘        (202, rápido)         events +          (cron)
-                                           attempts
-```
+**What does it cost to run?** Your own hardware, or free tiers (Vercel + Neon) for
+small/medium volume.
 
-- La ingesta nunca entrega en línea: un `INSERT` y responder. Hacer esperar al emisor por
-  un tercero es exactamente cómo se pierden eventos.
-- Los workers toman eventos con `FOR UPDATE SKIP LOCKED`: varios en paralelo sin entregas
-  dobles.
-- El intento se registra antes que el resultado. Si el proceso muere a mitad de entrega,
-  el lease vence y se reintenta: un duplicado se recupera, una pérdida silenciosa no.
-- Backoff exponencial con jitter (5s, 15s, 45s, 2m, 7m, 20m, 1h) para no voltear de nuevo
-  a un destino recién recuperado.
-- Cada entrega sale firmada (`t=…,v1=HMAC-SHA256(t.body)`) para que el destino verifique
-  origen y rechace replays.
-- La salud de cada integración se deriva de la cola (los eventos se apilan detrás de un
-  destino roto), sin heartbeats.
+**Are events lost if Acuse restarts?** No: every event is persisted before the sender
+gets a response. From there it can only be delivered or parked, never dropped.
 
-Stack: Next.js 16, React 19, Tailwind 4, Postgres (driver `pg`). Single-tenant, sin
-cuentas, sin alertas por mail/Slack todavía, retención infinita. Para esta categoría a
-escala existen productos comerciales (Svix, Hookdeck); acuse es la versión chica,
-self-hosted y legible.
+**What if a destination is down for a whole day?** Retries continue with growing waits
+until attempts are exhausted; the event is then marked undelivered, kept forever, and
+can be replayed with one click.
 
-</details>
+**Does it work with any system?** Anything that sends webhooks (HTTP calls) can point at
+Acuse, and anything that accepts HTTP can be a destination.
 
-## Preguntas frecuentes
+**How does it compare to Svix or Hookdeck?** Those are excellent commercial products for
+this category at scale. Acuse is the small, readable, self-hosted take: one container,
+one Postgres, no accounts, MIT license.
 
-**¿Cuánto cuesta tenerlo andando?** Con las capas gratuitas de Vercel y Neon, $0 para
-volúmenes chicos y medianos.
+## Author
 
-**¿Se pierden avisos si acuse se reinicia?** No: cada evento se guarda en la base de datos
-*antes* de responderle al emisor. Ahí ya no se puede perder.
-
-**¿Qué pasa si el destino está caído un día entero?** Acuse reintenta con esperas
-crecientes hasta agotar los intentos; el evento queda marcado "sin entregar" con su botón
-de reenviar. Nada se borra solo.
-
-**¿Sirve para cualquier sistema?** Cualquier cosa que mande webhooks (avisos HTTP) puede
-apuntar a acuse, y cualquier sistema que reciba HTTP puede ser destino.
+Built by **Malena** — [github.com/malenitaa](https://github.com/malenitaa).
 
 ## Enjoyed it?
 
