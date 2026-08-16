@@ -47,6 +47,10 @@ const es = {
     pause: 'Pausar entregas',
     resume: 'Reanudar entregas',
     done: 'hecho',
+    copy: 'Copiar',
+    copied: 'copiado',
+    reveal: 'Mostrar',
+    hide: 'Ocultar',
   },
   dashboard: {
     headline: 'Eventos rescatados',
@@ -164,6 +168,9 @@ const es = {
   endpoint: {
     ingestLabel: 'Le pasás esta URL al que manda el webhook',
     deliverLabel: 'Y nosotros entregamos acá',
+    secretLabel: 'Secreto de firma',
+    secretHelp:
+      'Con esto el destino verifica que cada entrega salió de acá (firma Standard Webhooks). Compartilo solo con quien recibe.',
     retrySentence: (max: number, schedule: string) =>
       `Si el destino no contesta, reintentamos ${max} veces separando cada intento: ${schedule}. Después queda marcado como sin entregar y esperando a una persona.`,
     received: 'Recibidos',
@@ -211,6 +218,10 @@ const en: typeof es = {
     pause: 'Pause deliveries',
     resume: 'Resume deliveries',
     done: 'done',
+    copy: 'Copy',
+    copied: 'copied',
+    reveal: 'Reveal',
+    hide: 'Hide',
   },
   dashboard: {
     headline: 'Events rescued',
@@ -328,6 +339,9 @@ const en: typeof es = {
   endpoint: {
     ingestLabel: 'Give this URL to whatever sends the webhook',
     deliverLabel: 'And we deliver here',
+    secretLabel: 'Signing secret',
+    secretHelp:
+      'The destination uses this to verify that each delivery really came from here (Standard Webhooks signature). Share it only with the receiving side.',
     retrySentence: (max: number, schedule: string) =>
       `If the destination does not answer, we retry ${max} times, spacing the attempts: ${schedule}. After that the event is marked undelivered, waiting for a human.`,
     received: 'Received',

@@ -54,7 +54,8 @@ for (const endpoint of ENDPOINTS) {
       endpoint.name,
       newId('ik', 20),
       `${APP_URL}/api/demo-sink?${endpoint.sink}`,
-      randomBytes(24).toString('hex'),
+      // Same format as newSigningSecret() in src/lib/signature.ts.
+      `whsec_${randomBytes(24).toString('base64')}`,
       endpoint.maxAttempts,
     ],
   )

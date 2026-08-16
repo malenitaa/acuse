@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { toggleEndpointAction } from '@/app/actions'
+import { CopyButton } from '@/components/copy-button'
+import { SecretLine } from '@/components/secret-line'
 import {
   BackStrip,
   Empty,
@@ -29,6 +31,7 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
 
   const events = await listEvents({ endpointId: endpoint.id, limit: 40 })
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000'
+  const ingestUrl = `${appUrl}/api/i/${endpoint.ingest_key}`
   const schedule = retryScheduleLabels(endpoint.max_attempts)
 
   return (
@@ -52,10 +55,26 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="mt-5 space-y-3">
-          <UrlLine label={t.endpoint.ingestLabel}>
-            {appUrl}/api/i/{endpoint.ingest_key}
+          <UrlLine
+            label={t.endpoint.ingestLabel}
+            action={
+              <CopyButton text={ingestUrl} label={t.actions.copy} doneLabel={t.actions.copied} />
+            }
+          >
+            {ingestUrl}
           </UrlLine>
           <UrlLine label={t.endpoint.deliverLabel}>{endpoint.destination_url}</UrlLine>
+          <SecretLine
+            secret={endpoint.signing_secret}
+            labels={{
+              label: t.endpoint.secretLabel,
+              help: t.endpoint.secretHelp,
+              reveal: t.actions.reveal,
+              hide: t.actions.hide,
+              copy: t.actions.copy,
+              copied: t.actions.copied,
+            }}
+          />
         </div>
 
         <p className="mt-5 text-[12px] italic leading-relaxed text-faint">
@@ -131,10 +150,21 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
   )
 }
 
-function UrlLine({ label, children }: { label: string; children: React.ReactNode }) {
+function UrlLine({
+  label,
+  action,
+  children,
+}: {
+  label: string
+  action?: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-[0.08em] text-faint">{label}</div>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <div className="text-[11px] uppercase tracking-[0.08em] text-faint">{label}</div>
+        {action}
+      </div>
       <code className="mt-1 block overflow-x-auto border border-line-soft bg-panel-2 px-3 py-2 font-mono text-[12px] text-accent">
         {children}
       </code>
