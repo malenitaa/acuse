@@ -1,0 +1,35 @@
+# Everything Acuse needs, in one command: docker compose up -d
+# First boot creates the database schema automatically (db/schema.sql runs
+# against the empty volume). Data survives restarts in the `acuse-data` volume.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: acuse
+      POSTGRES_USER: acuse
+      POSTGRES_PASSWORD: acuse
+    volumes:
+      - acuse-data:/var/lib/postgresql/data
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U acuse -d acuse']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://acuse:acuse@db:5432/acuse
+      APP_URL: http://localhost:3000
+      EMBEDDED_WORKER: '1'
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  acuse-data:

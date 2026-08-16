@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // Self-contained build for the Docker image: .next/standalone carries its
+  // own node_modules subset and runs with plain `node server.js`.
+  output: 'standalone',
   // `pg` opens raw TCP sockets, so it must stay outside the bundler.
   serverExternalPackages: ['pg'],
   turbopack: {
