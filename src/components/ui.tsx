@@ -117,12 +117,12 @@ export function HealthBadge({
   lang?: Lang
 }) {
   return (
-    // items-baseline seats the square on the text baseline like a character;
-    // the extra half pixel down compensates for the optical overshoot of
-    // round lowercase letters (c, a, o dip slightly below the baseline), so
-    // square and word read as vertically level.
-    <span className={`inline-flex items-baseline gap-1.5 text-[12px] font-medium ${HEALTH_STYLES[health]}`}>
-      <span aria-hidden className="inline-block size-1.5 translate-y-[0.5px] bg-current" />
+    // Inline layout with vertical-align: middle — the spec centers the square
+    // on baseline + half x-height, i.e. the optical middle of the lowercase
+    // band, derived from font metrics instead of pixel nudges. Same technique
+    // as the composition-bar legend.
+    <span className={`text-[12px] font-medium ${HEALTH_STYLES[health]}`}>
+      <span aria-hidden className="mr-1.5 inline-block size-1.5 align-middle bg-current" />
       {dict[lang].health[health]}
     </span>
   )
