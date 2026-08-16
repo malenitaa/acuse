@@ -38,8 +38,38 @@ de que se pierda algo. Y te muestra el número que importa: cuántos avisos resc
 
 ## Instalarlo en tu empresa
 
-No hace falta ser programador, pero sí animarse a seguir pasos en pantallas nuevas — o
-pedirle 30 minutos a la persona de sistemas. Todo lo necesario tiene capa gratuita.
+Hay dos caminos. El recomendado es el primero: acuse corre **en tus propias máquinas**,
+sin depender de ninguna plataforma, sin comprar dominios y sin que los datos salgan de tu
+red.
+
+### Opción A — En tu propia máquina o servidor (recomendada)
+
+Lo único que hace falta es [Docker](https://www.docker.com/products/docker-desktop/)
+(gratis), que es una forma estándar de correr programas empaquetados. Después, en una
+terminal:
+
+```bash
+git clone https://github.com/malenitaa/acuse.git
+cd acuse
+docker compose up -d
+```
+
+Eso levanta **todo**: la aplicación, su base de datos y el motor de reintentos, en un
+solo comando. El panel queda en `http://localhost:3000` (o la IP del servidor donde lo
+corras). Los datos viven en un volumen de Docker y sobreviven reinicios; para apagarlo,
+`docker compose down`.
+
+- La primera vez tarda unos minutos (construye la imagen); después arranca en segundos.
+- Las integraciones se dan de alta con una fila en la base (ver paso 6 de la opción B —
+  aplica igual acá, con `docker compose exec db psql -U acuse`).
+- Para exponerlo fuera de tu red vas a querer un dominio y HTTPS adelante (Caddy o
+  nginx); para uso interno, la IP alcanza.
+
+### Opción B — En la nube con Vercel
+
+Si preferís no administrar ningún servidor, se puede desplegar en Vercel con una base
+Neon. No hace falta ser programador, pero sí animarse a seguir pasos en pantallas
+nuevas — o pedirle 30 minutos a la persona de sistemas. Todo tiene capa gratuita.
 
 **Vas a necesitar:**
 
@@ -98,8 +128,11 @@ recupera, una caída — los tres estados que el panel tiene que saber contar):
 npm run simulate -- --events=70 --seconds=140
 ```
 
-El worker de reintentos en producción es una ruta HTTP disparada por Vercel Cron cada
-minuto, protegida por `CRON_SECRET`.
+El motor de reintentos tiene dos modos: con `EMBEDDED_WORKER=1` (el default de la imagen
+Docker) corre adentro del proceso, un pase cada 30 segundos — sin scheduler externo. En
+Vercel, donde el proceso no persiste, el mismo pase lo dispara Vercel Cron cada minuto
+contra `/api/cron`, protegido por `CRON_SECRET`. Ambos modos son concurrentes-seguros:
+los eventos se toman con `FOR UPDATE SKIP LOCKED`.
 
 </details>
 
