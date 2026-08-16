@@ -32,7 +32,7 @@ export default async function EventsPage({
                 <Link
                   key={filter.value}
                   href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
-                  className={`border-b-2 py-0.5 text-[12px] transition ${
+                  className={`border-b-2 py-0.5 text-[12px] transition-colors ${
                     status === filter.value
                       ? 'border-text text-text'
                       : 'border-transparent text-faint hover:text-muted'

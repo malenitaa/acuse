@@ -114,7 +114,7 @@ export { SubmitButton } from './submit-button'
 export function BackStrip({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <div className="px-6 py-2.5">
-      <Link href={href} className="text-[12px] text-faint transition hover:text-muted">
+      <Link href={href} className="text-[12px] text-faint transition-colors hover:text-muted">
         ← {children}
       </Link>
     </div>
