@@ -62,7 +62,9 @@ export default async function DashboardPage() {
         <SectionTitle
           aside={
             <form action={processQueueAction}>
-              <SubmitButton variant="primary">Procesar cola ahora</SubmitButton>
+              <SubmitButton variant="primary" doneLabel="asentado">
+                Procesar cola ahora
+              </SubmitButton>
             </form>
           }
         >
@@ -127,7 +129,7 @@ export default async function DashboardPage() {
       <Section>
         <SectionTitle
           aside={
-            <Link href="/events" className="text-[12px] text-faint transition hover:text-muted">
+            <Link href="/events" className="text-[12px] text-faint transition-colors hover:text-muted">
               ver todos →
             </Link>
           }
@@ -238,7 +240,7 @@ function CompositionBar({ stats }: { stats: Stats }) {
 /** A broken integration is an annotation on the record, not an app banner. */
 function MarginNote({ names }: { names: string[] }) {
   return (
-    <div className="px-6 py-3">
+    <div className="note-enter px-6 py-3">
       <p className="text-[13px] leading-relaxed">
         <span className="font-semibold text-bad">
           ☞ {names.length === 1

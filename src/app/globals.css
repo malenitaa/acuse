@@ -21,6 +21,10 @@
 
   --font-serif: 'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* One shared voice for motion: a strong ease-out (starts fast, settles firm),
+   * like a stamp landing on paper. Overrides Tailwind's ease-out utility too. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
@@ -53,11 +57,41 @@ body {
 
 .draw-in {
   transform-origin: left;
-  animation: draw-in 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  animation: draw-in 300ms var(--ease-out);
+}
+
+/* Button labels swap between states (label → «procesando…» → «✓ asentado»).
+ * The entering label fades in through a slight blur, which masks the swap so
+ * it reads as one label changing instead of two texts overlapping. */
+.label-swap {
+  display: inline-block;
+  transition: opacity 200ms ease, filter 200ms ease;
+
+  @starting-style {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* The ☞ margin note materializes between auto-refreshes when an integration
+ * breaks; without a bridge it teleports in. It settles like ink being written:
+ * a touch above its place, then down into it. */
+.note-enter {
+  transition: opacity 200ms var(--ease-out), translate 200ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 -2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .draw-in {
     animation: none;
+  }
+
+  /* Keep the fade (it aids comprehension), drop the movement. */
+  .note-enter {
+    transition-property: opacity;
   }
 }

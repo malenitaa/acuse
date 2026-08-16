@@ -35,7 +35,10 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           </div>
           <form action={replayEventAction}>
             <input type="hidden" name="eventId" value={event.id} />
-            <SubmitButton variant={event.status === 'dead' ? 'primary' : 'ghost'}>
+            <SubmitButton
+              variant={event.status === 'dead' ? 'primary' : 'ghost'}
+              doneLabel="reenviado"
+            >
               Reenviar ahora
             </SubmitButton>
           </form>
