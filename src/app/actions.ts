@@ -96,6 +96,24 @@ export async function sendEventAction(
 }
 
 /**
+ * Postpone a pending event's next attempt to a chosen time ("not at 5 am —
+ * at 7, when I'm awake"). Same lever the scheduler uses: next_attempt_at.
+ * Clearing the lock makes the new time authoritative immediately.
+ */
+export async function postponeEventAction(formData: FormData) {
+  const eventId = String(formData.get('eventId') ?? '')
+  const until = new Date(String(formData.get('until') ?? ''))
+  if (eventId && !Number.isNaN(until.getTime())) {
+    await query(
+      `update events set next_attempt_at = $2, locked_at = null
+       where id = $1 and status = 'pending'`,
+      [eventId, until.toISOString()],
+    )
+  }
+  refresh()
+}
+
+/**
  * Archive / restore by hand. Nothing in Acuse is deletable — archiving moves
  * an event out of the operational lists into the browsable archive, and
  * restoring brings it back. Pending events cannot be archived: they are work

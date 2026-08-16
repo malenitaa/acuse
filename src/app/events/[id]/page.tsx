@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { archiveEventAction, replayEventAction, unarchiveEventAction } from '@/app/actions'
+import {
+  archiveEventAction,
+  postponeEventAction,
+  replayEventAction,
+  unarchiveEventAction,
+} from '@/app/actions'
 import { BackStrip, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { formatTimestamp, timeAgo } from '@/lib/format'
 import { dict, type Lang } from '@/lib/i18n'
@@ -71,6 +76,26 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           <p className="mt-4 max-w-xl text-[12px] italic leading-relaxed text-faint">
             ☞ {t.events.archivedNote}
           </p>
+        ) : null}
+
+        {event.status === 'pending' ? (
+          <form action={postponeEventAction} className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-2">
+            <input type="hidden" name="eventId" value={event.id} />
+            <label className="block">
+              <span className="text-[11px] uppercase tracking-[0.08em] text-faint">
+                {t.event.postponeLabel}
+              </span>
+              <input
+                name="until"
+                type="datetime-local"
+                required
+                className="mt-1 block border border-line bg-panel px-3 py-1.5 text-[12px]"
+              />
+            </label>
+            <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.event.postponed}>
+              {t.event.postpone}
+            </SubmitButton>
+          </form>
         ) : null}
 
         <dl className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3 text-[12px] sm:grid-cols-4">
