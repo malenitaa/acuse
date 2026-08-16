@@ -18,7 +18,7 @@ import { formatPercent, timeAgo, truncate } from '@/lib/format'
 import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
 import { retryScheduleLabels } from '@/lib/retry'
-import { getEndpoint, listEvents } from '@/lib/stats'
+import { countEvents, getEndpoint, listEvents } from '@/lib/stats'
 import { SendEventForm } from './send-event-form'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +29,10 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
   if (!endpoint) notFound()
   const t = dict[lang]
 
-  const events = await listEvents({ endpointId: endpoint.id, limit: 40 })
+  const [events, eventTotal] = await Promise.all([
+    listEvents({ endpointId: endpoint.id, limit: 40 }),
+    countEvents({ endpointId: endpoint.id }),
+  ])
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000'
   const ingestUrl = `${appUrl}/api/i/${endpoint.ingest_key}`
   const schedule = retryScheduleLabels(endpoint.max_attempts)
@@ -143,6 +146,11 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
               ))}
             </tbody>
             </table>
+            {eventTotal > events.length ? (
+              <p className="border-t border-line-soft px-6 py-3 text-[12px] text-faint">
+                {t.events.showingLatest(events.length, eventTotal)}
+              </p>
+            ) : null}
           </div>
         )}
       </Section>

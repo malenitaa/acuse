@@ -123,6 +123,11 @@ export default async function EventsPage({
               ))}
             </tbody>
             </table>
+            {total > events.length ? (
+              <p className="border-t border-line-soft px-6 py-3 text-[12px] text-faint">
+                {t.events.showingLatest(events.length, total)}
+              </p>
+            ) : null}
           </div>
         )}
       </Section>

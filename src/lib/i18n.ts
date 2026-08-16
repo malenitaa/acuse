@@ -112,6 +112,8 @@ const es = {
     empty: 'No hay eventos con ese estado.',
     replayAll: (n: number) => (n === 1 ? 'Reenviar el evento' : `Reenviar los ${n}`),
     replayAllNote: 'Todos vuelven a la cola y se van entregando ya mismo.',
+    showingLatest: (shown: number, total: number) =>
+      `Mostrando los últimos ${shown} de ${total} eventos.`,
   },
   event: {
     received: 'Recibido',
@@ -285,6 +287,8 @@ const en: typeof es = {
     empty: 'No events with that status.',
     replayAll: (n: number) => (n === 1 ? 'Redeliver the event' : `Redeliver all ${n}`),
     replayAllNote: 'They all rejoin the queue and start delivering right away.',
+    showingLatest: (shown: number, total: number) =>
+      `Showing the latest ${shown} of ${total} events.`,
   },
   event: {
     received: 'Received',
