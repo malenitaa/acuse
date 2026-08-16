@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { findEndpointByKey, receiveEvent } from '@/lib/ingest'
+import { allowIngest } from '@/lib/rate-limit'
 
 /** Bigger than this and the sender is not calling a webhook, it is uploading. */
 const MAX_BODY_BYTES = 1_000_000
@@ -14,6 +15,16 @@ const MAX_BODY_BYTES = 1_000_000
  */
 export async function POST(request: NextRequest, context: { params: Promise<{ key: string }> }) {
   const { key } = await context.params
+
+  // Rate limit before touching the database: an abusive sender should cost
+  // as little as possible. Serious webhook emitters (Stripe, Shopify) treat
+  // 429 + retry-after politely and try again.
+  if (!allowIngest(key)) {
+    return Response.json(
+      { error: 'demasiadas solicitudes' },
+      { status: 429, headers: { 'retry-after': '60' } },
+    )
+  }
 
   const endpoint = await findEndpointByKey(key)
   if (!endpoint) {

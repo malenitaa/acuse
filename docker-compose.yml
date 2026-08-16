@@ -26,6 +26,10 @@ services:
       DATABASE_URL: postgresql://acuse:acuse@db:5432/acuse
       APP_URL: http://localhost:3000
       EMBEDDED_WORKER: '1'
+      # Uncomment to lock the console behind HTTP Basic Auth (any username):
+      # CONSOLE_PASSWORD: choose-a-long-password
+      # Uncomment if untrusted people can create endpoints on this instance:
+      # BLOCK_PRIVATE_DESTINATIONS: '1'
     depends_on:
       db:
         condition: service_healthy

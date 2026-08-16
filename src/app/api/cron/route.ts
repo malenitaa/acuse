@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import { drainQueue } from '@/lib/delivery'
 
@@ -12,8 +13,16 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET
-  if (secret && request.headers.get('authorization') !== `Bearer ${secret}`) {
-    return Response.json({ error: 'no autorizado' }, { status: 401 })
+  if (secret) {
+    const given = request.headers.get('authorization') ?? ''
+    const expected = `Bearer ${secret}`
+    // Constant-time comparison: a plain !== leaks how many leading
+    // characters matched through response timing.
+    const a = Buffer.from(given)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      return Response.json({ error: 'no autorizado' }, { status: 401 })
+    }
   }
 
   const summary = await drainQueue()

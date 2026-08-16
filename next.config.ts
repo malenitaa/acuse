@@ -16,6 +16,22 @@ const nextConfig: NextConfig = {
     // and lands in the home directory, because the repo lives under iCloud.
     root: dirname(fileURLToPath(import.meta.url)),
   },
+  // Baseline security headers (OWASP A05). CSP is deliberately absent for
+  // now: the theme-init inline script would need a nonce pipeline; noted in
+  // the private README as follow-up work.
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig

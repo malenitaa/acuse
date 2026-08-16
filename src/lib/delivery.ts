@@ -1,6 +1,7 @@
 import 'server-only'
 import { createHmac } from 'node:crypto'
 import { query } from './db'
+import { checkDestination } from './destination-guard'
 import { DELIVERY_TIMEOUT_MS, backoffMs } from './retry'
 import type { DeliveryJob, DeliveryResult, EventStatus } from './types'
 
@@ -64,6 +65,13 @@ async function sendOnce(job: DeliveryJob, attemptNumber: number) {
   let statusCode: number | null = null
   let responseBody: string | null = null
   let error: string | null = null
+
+  // The destination comes from the database, but "trust the database" is how
+  // SSRF happens: validate at the moment of use (OWASP A10).
+  const guard = checkDestination(job.destination_url)
+  if (!guard.ok) {
+    return { statusCode, responseBody, error: guard.reason, durationMs: 0, ok: false }
+  }
 
   try {
     const response = await fetch(job.destination_url, {
