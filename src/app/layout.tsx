@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Script from 'next/script'
+import { ThemeToggle } from '@/components/theme-toggle'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -9,25 +11,34 @@ export const metadata: Metadata = {
 }
 
 /**
- * The whole app renders as one continuous sheet of paper on a desk — a
- * letterhead, ruled sections, a colophon. No floating cards: a record book
- * is a single document, and the layout should read like one.
+ * One skeleton, two skins (see globals.css): «instrumento» renders it as a
+ * full-width console, «libro» as a sheet of paper on a desk. The inline
+ * script re-applies the visitor's stored choice before anything paints.
  */
+// Runs once from the raw HTML, before paint and before hydration. React warns
+// in dev that it will never re-execute this on client renders — that is the
+// point: it must run exactly once, first. (Same pattern as next-themes.)
+const themeInit = `try{var t=localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'){document.documentElement.dataset.theme=t}}catch(e){}`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className="min-h-screen px-3 py-5 sm:px-8 sm:py-10">
-        <div className="mx-auto max-w-4xl border border-line bg-panel shadow-[0_1px_2px_rgba(32,27,18,0.18)]">
-          <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b-3 border-double border-line px-6 py-5">
-            <Link href="/" className="font-serif text-2xl font-semibold tracking-tight">
+    <html lang="es" data-theme="instrumento" suppressHydrationWarning>
+      <body>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInit}
+        </Script>
+        <div className="app-frame">
+          <header className="app-header">
+            <Link href="/" className="app-brand">
               Acuse
             </Link>
-            <p className="font-serif text-[14px] italic text-faint">
-              registro de entregas — ningún evento se pierde
-            </p>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+              <p className="app-tagline">registro de entregas — ningún evento se pierde</p>
+              <ThemeToggle />
+            </div>
           </header>
-          <main>{children}</main>
-          <footer className="border-t border-line-soft px-6 py-4 text-[12px] text-faint">
+          <main className="app-main">{children}</main>
+          <footer className="app-footer">
             Instancia de demostración · el tráfico lo genera{' '}
             <code className="font-mono text-muted">npm run simulate</code>
           </footer>

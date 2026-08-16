@@ -49,10 +49,12 @@ const TONE_TEXT = {
   bad: 'text-bad',
 }
 
-/** Ledger totals: label, dot leader, figure — the way a sum line is written. */
+/** Ledger totals: label, dot leader, figure — the way a sum line is written.
+ * Columns follow the container (the theme decides how wide that is), not the
+ * viewport: 2-up on the «libro» sheet, 4-up on the full-width «instrumento». */
 export function Totals({ items }: { items: TotalItem[] }) {
   return (
-    <div className="grid grid-cols-1 gap-x-10 gap-y-3 px-6 py-5 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-x-10 gap-y-3 px-6 py-5 @2xl:grid-cols-2 @6xl:grid-cols-4">
       {items.map((item) => (
         <div key={item.label}>
           <div className="flex items-baseline gap-2 text-[13px]">

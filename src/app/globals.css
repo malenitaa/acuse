@@ -1,16 +1,47 @@
 @import 'tailwindcss';
 
 /*
- * Ledger-book look. The product is literally a book of delivery receipts
- * ("acuse de recibo"), so the design borrows from printed record books:
- * paper background, ink text, hairline rules, square corners, stamps.
+ * Two personalities, one structure, chosen by the operator:
+ *
+ *   «instrumento» (default) — dark full-width ops console, the language
+ *   people who live in dashboards already speak.
+ *   «libro» — the ledger book: a sheet of paper on a desk, serif, stamps.
+ *   The product is literally a book of delivery receipts ("acuse de recibo").
+ *
+ * The @theme block holds the default («instrumento») values; [data-theme='libro']
+ * overrides the same custom properties, so every Tailwind utility follows the
+ * switch. The shell (.app-*) also changes skeleton per theme: a tool is
+ * full-width, a document is a centered sheet.
  */
 @theme {
+  --color-ink: #0a0c10; /* what shows around/behind the content */
+  --color-panel: #12151b;
+  --color-panel-2: #1a1e26; /* inset / hover */
+  --color-line: #313947; /* strong rule */
+  --color-line-soft: #1f242e; /* hairline */
+  --color-text: #e6e9ef;
+  --color-muted: #9aa3b2;
+  --color-faint: #687181;
+  --color-good: #3fb950; /* terminal green */
+  --color-warn: #d29922; /* amber */
+  --color-bad: #f85149; /* alert red */
+  --color-accent: #58a6ff; /* link blue */
+
+  /* In «instrumento», headings drop the serif: same classes, technical voice. */
+  --font-serif: ui-sans-serif, -apple-system, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* One shared voice for motion: a strong ease-out (starts fast, settles firm),
+   * like a stamp landing on paper. Overrides Tailwind's ease-out utility too. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-theme='libro'] {
   --color-ink: #ddd3bd; /* desk: what shows around the sheet */
   --color-panel: #f9f6ee; /* the sheet itself */
-  --color-panel-2: #f0ead9; /* inset / hover */
-  --color-line: #9d9075; /* strong rule */
-  --color-line-soft: #d9d0ba; /* hairline */
+  --color-panel-2: #f0ead9;
+  --color-line: #9d9075;
+  --color-line-soft: #d9d0ba;
   --color-text: #201b12; /* ink */
   --color-muted: #58503f;
   --color-faint: #8b8168;
@@ -20,14 +51,13 @@
   --color-accent: #2a4d78; /* fountain-pen blue */
 
   --font-serif: 'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
-
-  /* One shared voice for motion: a strong ease-out (starts fast, settles firm),
-   * like a stamp landing on paper. Overrides Tailwind's ease-out utility too. */
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
+  color-scheme: dark;
+}
+
+[data-theme='libro'] {
   color-scheme: light;
 }
 
@@ -37,12 +67,109 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ---------- App shell: console vs. sheet ---------- */
+
+/* «instrumento»: full-width console — top bar, content using the screen,
+ * capped only on ultrawide monitors. */
+.app-frame {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1.5rem;
+  row-gap: 0.25rem;
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.75rem 1.5rem;
+}
+
+.app-brand {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-tagline {
+  font-size: 12px;
+  color: var(--color-faint);
+}
+
+.app-main {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  flex: 1;
+  /* Children measure themselves against this container, not the viewport,
+   * so grids adapt to whichever skeleton the theme chose. */
+  container-type: inline-size;
+}
+
+.app-footer {
+  border-top: 1px solid var(--color-line-soft);
+  padding: 0.75rem 1.5rem;
+  font-size: 12px;
+  color: var(--color-faint);
+}
+
+/* «libro»: the centered sheet on a desk. */
+[data-theme='libro'] body {
+  padding: 1.25rem 0.75rem;
+}
+
+@media (min-width: 640px) {
+  [data-theme='libro'] body {
+    padding: 2.5rem 2rem;
+  }
+}
+
+[data-theme='libro'] .app-frame {
+  display: block;
+  min-height: 0;
+  max-width: 56rem;
+  margin-inline: auto;
+  border: 1px solid var(--color-line);
+  background: var(--color-panel);
+  box-shadow: 0 1px 2px rgba(32, 27, 18, 0.18);
+}
+
+[data-theme='libro'] .app-header {
+  align-items: baseline;
+  border-bottom: 3px double var(--color-line);
+  padding: 1.25rem 1.5rem;
+}
+
+[data-theme='libro'] .app-brand {
+  font-size: 24px;
+}
+
+[data-theme='libro'] .app-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+}
+
+[data-theme='libro'] .app-main {
+  max-width: none;
+}
+
+[data-theme='libro'] .app-footer {
+  padding: 1rem 1.5rem;
+}
+
+/* ---------- Shared details ---------- */
+
 /* Numbers that change should not make the layout twitch. */
 .tnum {
   font-variant-numeric: tabular-nums;
 }
 
-/* Keyboard focus in fountain-pen blue; mouse clicks stay unmarked. */
+/* Keyboard focus in the theme's accent; mouse clicks stay unmarked. */
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
