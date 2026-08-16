@@ -41,32 +41,38 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script id="theme-init" strategy="beforeInteractive">
           {themeInit}
         </Script>
-        {/* Viewing preferences live on the "desk", outside whichever skeleton
-            the theme draws — same screen corner in both themes. */}
-        <div className="app-controls">
-          <ThemeToggle labels={t.shell.themeNames} />
-          <SchemeToggle />
-          <LangToggle current={lang} />
-        </div>
         <div className="app-frame">
-          <header className="app-header">
-            <Link href="/" className="app-brand">
-              Acuse
-              {instanceName ? <span className="text-muted"> · {instanceName}</span> : null}
-            </Link>
-            <p className="app-tagline">{t.shell.tagline}</p>
-          </header>
-          <ShellNav
-            items={[
-              { href: '/', label: t.shell.navDashboard },
-              { href: '/events', label: t.shell.navEvents },
-              { href: '/endpoints/new', label: t.shell.navNew },
-            ]}
-          />
-          <main className="app-main">{children}</main>
-          <footer className="app-footer">
-            {t.shell.demoNote} <code className="font-mono text-muted">npm run simulate</code>
-          </footer>
+          {/* One DOM, two skeletons: «instrumento» renders this aside as a
+              left sidebar (nav on top, preferences at the bottom); «libro»
+              renders it as the book's title page, with the preferences
+              resting on the desk's corner. */}
+          <aside className="app-side">
+            <div className="app-side-top">
+              <Link href="/" className="app-brand">
+                Acuse
+                {instanceName ? <span className="text-muted"> · {instanceName}</span> : null}
+              </Link>
+              <p className="app-tagline">{t.shell.tagline}</p>
+            </div>
+            <ShellNav
+              items={[
+                { href: '/', label: t.shell.navDashboard },
+                { href: '/events', label: t.shell.navEvents },
+                { href: '/endpoints/new', label: t.shell.navNew },
+              ]}
+            />
+            <div className="app-side-controls">
+              <ThemeToggle labels={t.shell.themeNames} />
+              <SchemeToggle />
+              <LangToggle current={lang} />
+            </div>
+          </aside>
+          <div className="app-body">
+            <main className="app-main">{children}</main>
+            <footer className="app-footer">
+              {t.shell.demoNote} <code className="font-mono text-muted">npm run simulate</code>
+            </footer>
+          </div>
         </div>
       </body>
     </html>

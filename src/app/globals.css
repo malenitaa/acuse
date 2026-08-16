@@ -3,15 +3,15 @@
 /*
  * Two personalities, one structure, chosen by the operator:
  *
- *   «instrumento» (default) — dark full-width ops console, the language
- *   people who live in dashboards already speak.
+ *   «instrumento» (default) — an ops console with a sidebar: navigation on
+ *   top, viewing preferences at the bottom, content using the screen.
  *   «libro» — the ledger book: a sheet of paper on a desk, serif, stamps.
  *   The product is literally a book of delivery receipts ("acuse de recibo").
  *
  * The @theme block holds the default («instrumento») values; [data-theme='libro']
  * overrides the same custom properties, so every Tailwind utility follows the
- * switch. The shell (.app-*) also changes skeleton per theme: a tool is
- * full-width, a document is a centered sheet.
+ * switch. The shell (.app-*) also changes skeleton per theme: same DOM, a
+ * sidebar console or a title page — CSS decides.
  */
 @theme {
   --color-ink: #0a0c10; /* what shows around/behind the content */
@@ -104,28 +104,14 @@ html {
 }
 
 body {
-  position: relative; /* anchors .app-controls to the viewport top corner */
+  position: relative; /* anchors «libro»'s desk-corner controls */
   background: var(--color-ink);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Viewing preferences (theme + language) ---------- */
+/* ---------- Segmented controls (theme / scheme / language) ---------- */
 
-/* One fixed corner in BOTH themes: the controls belong to the desk, not to
- * the sheet or the console bar, so switching themes never moves them. */
-.app-controls {
-  position: absolute;
-  top: 0.55rem;
-  right: 1.25rem;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* Segmented control: bordered group, filled active segment — reads as a
- * control, not as small text. */
 .seg {
   display: inline-flex;
   border: 1px solid var(--color-line);
@@ -154,48 +140,248 @@ body {
   color: var(--color-text);
 }
 
-/* On phones the corner is too crowded: the controls become a slim row in the
- * normal flow, above everything. */
-@media (max-width: 639px) {
-  .app-controls {
-    position: static;
-    justify-content: flex-end;
-    padding: 0.6rem 0.75rem 0;
-  }
+/* ---------- App shell: sidebar console vs. sheet ---------- */
+
+/* «instrumento»: sidebar on the left — brand and tagline on top, navigation
+ * below, viewing preferences parked at the bottom. Content fills the rest. */
+.app-frame {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  min-height: 100dvh;
 }
 
-/* ---------- App shell: console vs. sheet ---------- */
+.app-side {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 0.9rem;
+  border-right: 1px solid var(--color-line);
+  background: var(--color-panel);
+}
 
-/* Navigation strip under the header: in «instrumento» a console tab row, in
- * «libro» the book's own index line. */
+.app-brand {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-tagline {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-faint);
+}
+
 .app-nav {
   display: flex;
-  gap: 1.25rem;
-  padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid var(--color-line-soft);
-  font-size: 12px;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
 }
 
 .app-nav a {
-  color: var(--color-faint);
-  transition: color 150ms ease;
+  padding: 6px 8px;
+  border-radius: var(--radius-ctl);
+  color: var(--color-muted);
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
 .app-nav a:hover {
-  color: var(--color-muted);
-}
-
-.app-nav a[aria-current='page'] {
   color: var(--color-text);
 }
 
+.app-nav a[aria-current='page'] {
+  background: var(--color-panel-2);
+  color: var(--color-text);
+}
+
+.app-side-controls {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.app-side-controls .seg {
+  display: flex;
+}
+
+.app-side-controls .seg button {
+  flex: 1;
+  text-align: center;
+}
+
+.app-body {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.app-main {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  flex: 1;
+  /* Children measure themselves against this container, not the viewport,
+   * so grids adapt to whichever skeleton the theme chose. */
+  container-type: inline-size;
+}
+
+.app-footer {
+  border-top: 1px solid var(--color-line-soft);
+  padding: 0.75rem 1.5rem;
+  font-size: 12px;
+  color: var(--color-faint);
+}
+
+/* Phones: the sidebar becomes a compact header block in the flow. */
+@media (max-width: 767px) {
+  .app-frame {
+    display: block;
+  }
+
+  .app-side {
+    position: static;
+    height: auto;
+    overflow: visible;
+    gap: 0.75rem;
+    border-right: none;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .app-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 0.25rem;
+  }
+
+  .app-side-controls {
+    margin-top: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .app-body {
+    min-height: 0;
+  }
+}
+
+/* «libro»: the centered sheet on a desk — a title page instead of a sidebar,
+ * and the viewing preferences resting on the desk's top corner. */
+[data-theme='libro'] body {
+  padding: 1.25rem 0.75rem;
+}
+
+@media (min-width: 640px) {
+  [data-theme='libro'] body {
+    padding: 2.5rem 2rem;
+  }
+}
+
+[data-theme='libro'] .app-frame {
+  display: block;
+  min-height: 0;
+  max-width: 56rem;
+  margin-inline: auto;
+  border: 1px solid var(--color-line);
+  background: var(--color-panel);
+  box-shadow: 0 1px 2px rgba(32, 27, 18, 0.18);
+}
+
+[data-theme='libro'] .app-side {
+  position: static;
+  height: auto;
+  overflow: visible;
+  display: block;
+  padding: 1.25rem 1.5rem 0;
+  border-right: none;
+  border-bottom: none;
+  background: transparent;
+}
+
+[data-theme='libro'] .app-brand {
+  font-size: 24px;
+}
+
+[data-theme='libro'] .app-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+}
+
+[data-theme='libro'] .app-side-top {
+  padding-bottom: 1rem;
+  border-bottom: 3px double var(--color-line);
+}
+
 [data-theme='libro'] .app-nav {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: 1.25rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-line-soft);
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 13px;
 }
 
-/* «Personalizar» dropdown on the dashboard. */
+[data-theme='libro'] .app-nav a {
+  padding: 0;
+  border-radius: 0;
+}
+
+[data-theme='libro'] .app-nav a[aria-current='page'] {
+  background: transparent;
+}
+
+[data-theme='libro'] .app-side-controls {
+  position: absolute;
+  top: 0.55rem;
+  right: 1.25rem;
+  z-index: 20;
+  margin: 0;
+  flex-direction: row;
+  align-items: center;
+}
+
+[data-theme='libro'] .app-side-controls .seg {
+  display: inline-flex;
+}
+
+[data-theme='libro'] .app-side-controls .seg button {
+  flex: none;
+}
+
+@media (max-width: 639px) {
+  [data-theme='libro'] .app-side-controls {
+    position: static;
+    flex-wrap: wrap;
+    padding-bottom: 0.5rem;
+  }
+}
+
+[data-theme='libro'] .app-main {
+  max-width: none;
+}
+
+[data-theme='libro'] .app-body {
+  display: block;
+  min-height: 0;
+}
+
+[data-theme='libro'] .app-footer {
+  padding: 1rem 1.5rem;
+}
+
+/* ---------- «Personalizar» dropdown on the dashboard ---------- */
+
 .panel-config {
   position: relative;
 }
@@ -248,110 +434,6 @@ body {
 
 .panel-config-menu input {
   accent-color: var(--color-accent);
-}
-
-/* «instrumento»: full-width console — top bar, content using the screen,
- * capped only on ultrawide monitors. */
-.app-frame {
-  display: flex;
-  min-height: 100dvh;
-  flex-direction: column;
-}
-
-.app-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  /* Brand and tagline sit together on the left; the right side stays clear
-   * for the overlaid .app-controls. */
-  justify-content: flex-start;
-  column-gap: 1rem;
-  row-gap: 0.25rem;
-  border-bottom: 1px solid var(--color-line);
-  padding: 0.75rem 1.5rem;
-}
-
-/* Only when the controls float in the corner does the bar need to keep its
- * right side clear for them. */
-@media (min-width: 640px) {
-  .app-header {
-    padding-right: 22rem;
-  }
-}
-
-.app-brand {
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.app-tagline {
-  font-size: 12px;
-  color: var(--color-faint);
-}
-
-.app-main {
-  width: 100%;
-  max-width: 90rem;
-  margin-inline: auto;
-  flex: 1;
-  /* Children measure themselves against this container, not the viewport,
-   * so grids adapt to whichever skeleton the theme chose. */
-  container-type: inline-size;
-}
-
-.app-footer {
-  border-top: 1px solid var(--color-line-soft);
-  padding: 0.75rem 1.5rem;
-  font-size: 12px;
-  color: var(--color-faint);
-}
-
-/* «libro»: the centered sheet on a desk. */
-[data-theme='libro'] body {
-  padding: 1.25rem 0.75rem;
-}
-
-@media (min-width: 640px) {
-  [data-theme='libro'] body {
-    padding: 2.5rem 2rem;
-  }
-}
-
-[data-theme='libro'] .app-frame {
-  display: block;
-  min-height: 0;
-  max-width: 56rem;
-  margin-inline: auto;
-  border: 1px solid var(--color-line);
-  background: var(--color-panel);
-  box-shadow: 0 1px 2px rgba(32, 27, 18, 0.18);
-}
-
-[data-theme='libro'] .app-header {
-  align-items: baseline;
-  justify-content: space-between;
-  border-bottom: 3px double var(--color-line);
-  padding: 1.25rem 1.5rem;
-}
-
-[data-theme='libro'] .app-brand {
-  font-size: 24px;
-}
-
-[data-theme='libro'] .app-tagline {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 14px;
-}
-
-[data-theme='libro'] .app-main {
-  max-width: none;
-}
-
-[data-theme='libro'] .app-footer {
-  padding: 1rem 1.5rem;
 }
 
 /* ---------- Control finish: each theme polishes in its own language ------
