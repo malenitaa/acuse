@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   // Self-contained build for the Docker image: .next/standalone carries its
   // own node_modules subset and runs with plain `node server.js`.
   output: 'standalone',
+  // Hide the floating Next.js dev-tools button ("N") in development; it reads
+  // as part of the product to anyone watching a demo.
+  devIndicators: false,
   // `pg` opens raw TCP sockets, so it must stay outside the bundler.
   serverExternalPackages: ['pg'],
   turbopack: {
