@@ -50,7 +50,8 @@ export default async function EventsPage({
         {events.length === 0 ? (
           <Empty>No hay eventos con ese estado.</Empty>
         ) : (
-          <table className="w-full text-[13px]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
             <thead className="text-[11px] uppercase tracking-[0.08em] text-faint">
               <tr className="border-b border-line-soft">
                 <th className="px-6 py-2 text-left font-medium">Evento</th>
@@ -64,7 +65,7 @@ export default async function EventsPage({
               {events.map((event) => (
                 <tr
                   key={event.id}
-                  className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
+                  className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
                 >
                   <td className="px-6 py-2.5">
                     <Link
@@ -87,7 +88,8 @@ export default async function EventsPage({
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Section>
     </Sheet>

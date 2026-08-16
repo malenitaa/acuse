@@ -82,12 +82,13 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
         {events.length === 0 ? (
           <Empty>Todavía no llegó ningún evento acá.</Empty>
         ) : (
-          <table className="w-full text-[13px]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px]">
             <tbody>
               {events.map((event) => (
                 <tr
                   key={event.id}
-                  className="border-b border-line-soft last:border-0 hover:bg-panel-2/60"
+                  className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
                 >
                   <td className="px-6 py-2.5">
                     <Link
@@ -109,7 +110,8 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         )}
       </Section>
     </Sheet>
