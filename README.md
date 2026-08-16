@@ -43,7 +43,8 @@ complains days later.
 - **Early failure detection**: an integration that stops responding is flagged on the
   dashboard while its events are still being retried, before anything is lost.
 - **Dead-letter queue with replay**: original payloads are kept, so any event, including
-  exhausted ones, can be redelivered with one click.
+  exhausted ones, can be redelivered with one click. After an outage, one button
+  redelivers every undelivered event at once.
 - **Full delivery audit trail**: every attempt is recorded with timestamp, status code,
   response body and duration.
 - **Compose and schedule events**: send a test event to any integration from the
@@ -58,7 +59,8 @@ complains days later.
   every request carries `webhook-id`, `webhook-timestamp` and
   `webhook-signature: v1,<base64>` (HMAC-SHA256 over `id.timestamp.body`), so
   destinations can verify origin and reject replays using any Standard Webhooks
-  library, Svix's SDKs included.
+  library, Svix's SDKs included. Each integration's secret lives on its console
+  page, masked, with reveal and copy buttons.
 - **Failure alerts as webhooks**: set `ALERT_WEBHOOK_URL` and every event that exhausts
   its retries POSTs a JSON alert there. Point it at a chat webhook, an automation-platform trigger, or
   even another Acuse: delivery failures become one more event your tools can route.
@@ -220,6 +222,9 @@ can be replayed with one click.
 
 **Does it work with any system?** Anything that sends webhooks (HTTP calls) can point at
 Acuse, and anything that accepts HTTP can be a destination.
+
+**Can I pause an integration?** Yes, and pausing rejects nothing: events keep arriving
+and being stored, only delivery stops. When you resume, everything goes out in order.
 
 **Does Acuse ever delete old events?** Never; deleting would betray the whole point.
 Retention archives instead: old delivered events move out of the way but stay browsable
