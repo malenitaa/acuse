@@ -30,6 +30,9 @@ services:
       # CONSOLE_PASSWORD: choose-a-long-password
       # Uncomment if untrusted people can create endpoints on this instance:
       # BLOCK_PRIVATE_DESTINATIONS: '1'
+      # Where to POST a JSON alert when an event exhausts its retries
+      # (a Slack webhook, an n8n/Albato trigger, or another Acuse):
+      # ALERT_WEBHOOK_URL: https://hooks.example.com/acuse-alerts
     depends_on:
       db:
         condition: service_healthy

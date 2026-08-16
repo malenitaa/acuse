@@ -38,6 +38,9 @@ complains days later.
 - **Signed deliveries** — each outgoing request carries
   `t=…,v1=HMAC-SHA256(t.body)` (the same scheme Stripe uses) so destinations can verify
   origin and reject replays.
+- **Failure alerts as webhooks** — set `ALERT_WEBHOOK_URL` and every event that exhausts
+  its retries POSTs a JSON alert there. Point it at Slack, an n8n or Albato trigger, or
+  even another Acuse: delivery failures become one more event your tools can route.
 - **Two themes × light/dark** — a full-width ops console («instrument») or a paper
   ledger («libro»), each in light and dark, following your system preference. Bilingual
   UI (English / Spanish). Choices are remembered.

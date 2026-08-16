@@ -1,4 +1,5 @@
 import 'server-only'
+import { buildDeadEventAlert, sendAlert } from './alerts'
 import { query } from './db'
 import { checkDestination } from './destination-guard'
 import { sign } from './signature'
@@ -152,6 +153,18 @@ export async function deliverEvent(
        where id = $1`,
       [job.id, status, attemptNumber, backoffMs(attemptNumber) / 1000, summary],
     )
+
+    if (exhausted) {
+      // Fire-and-forget: the alert must never delay or fail the pass.
+      void sendAlert(
+        buildDeadEventAlert({
+          eventId: job.id,
+          endpointName: job.endpoint_name,
+          attempts: attemptNumber,
+          lastError: summary,
+        }),
+      )
+    }
   }
 
   return {
