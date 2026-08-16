@@ -5,7 +5,7 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
  * (https://www.standardwebhooks.com): HMAC-SHA256 over `id.timestamp.body`,
  * sent as `webhook-signature: v1,<base64>` alongside `webhook-id` and
  * `webhook-timestamp`. Destinations can verify Acuse deliveries with any
- * Standard Webhooks library — Svix's included — or with `verifySignature`
+ * Standard Webhooks library (Svix's included) or with `verifySignature`
  * below, kept here as executable documentation.
  *
  * Secrets: new ones are generated spec-style (`whsec_` + base64 key). Plain

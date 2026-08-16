@@ -11,7 +11,7 @@ const globalForWorker = globalThis as unknown as { acuseWorkerStarted?: boolean 
  * Embedded delivery worker, for self-hosted deployments where there is no
  * external cron (Docker, a bare server, someone's laptop). One pass every 30
  * seconds; overlapping passes are safe because events are claimed with
- * `FOR UPDATE SKIP LOCKED`. On Vercel this stays off — serverless processes
+ * `FOR UPDATE SKIP LOCKED`. On Vercel this stays off; serverless processes
  * do not stay alive between requests, so Vercel Cron does the ticking there.
  */
 export function startEmbeddedWorker() {

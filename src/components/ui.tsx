@@ -50,7 +50,7 @@ const TONE_TEXT = {
   bad: 'text-bad',
 }
 
-/** Ledger totals: label, dot leader, figure — the way a sum line is written.
+/** Ledger totals: label, dot leader, figure, the way a sum line is written.
  * Columns follow the container (the theme decides how wide that is), not the
  * viewport: 2-up on the «libro» sheet, 4-up on the full-width «instrumento». */
 export function Totals({ items, lang = 'es' }: { items: TotalItem[]; lang?: Lang }) {
@@ -117,7 +117,7 @@ export function HealthBadge({
   lang?: Lang
 }) {
   return (
-    // Inline layout with vertical-align: middle — the spec centers the square
+    // Inline layout with vertical-align: middle: the spec centers the square
     // on baseline + half x-height, i.e. the optical middle of the lowercase
     // band, derived from font metrics instead of pixel nudges. Same technique
     // as the composition-bar legend.

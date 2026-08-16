@@ -247,7 +247,7 @@ function Headline({ stats, lang }: { stats: Stats; lang: Lang }) {
 
 /**
  * Every event received, split by how it ended. The rescued number needs a
- * denominator to mean anything — and the events still unlanded belong in the
+ * denominator to mean anything, and the events still unlanded belong in the
  * same picture, or the bar flatters the product.
  */
 function CompositionBar({ stats, lang }: { stats: Stats; lang: Lang }) {

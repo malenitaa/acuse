@@ -21,11 +21,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * Language comes from a cookie, so the server renders it translated.
  */
 // Runs once from the raw HTML, before paint and before hydration. React warns
-// in dev that it will never re-execute this on client renders — that is the
+// in dev that it will never re-execute this on client renders; that is the
 // point: it must run exactly once, first. (Same pattern as next-themes.)
 // Theme comes from storage; the light/dark scheme falls back to the system
 // preference on first visit. URL params (?theme=libro&scheme=dark) override
-// both — handy for screenshots, demos and support links.
+// both, handy for screenshots, demos and support links.
 const themeInit = `try{var d=document.documentElement,q=new URLSearchParams(location.search),t=q.get('theme')||localStorage.getItem('acuse-theme');if(t==='libro'||t==='instrumento'||t==='plano'){d.dataset.theme=t}var s=q.get('scheme')||localStorage.getItem('acuse-scheme');if(s!=='light'&&s!=='dark'){s=window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}d.dataset.scheme=s}catch(e){}`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -49,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <aside className="app-side">
             <div className="app-side-top">
               {/* With a client name, the client is the hero and Acuse signs
-                  small — this is their console, our tool. */}
+                  small: this is their console, our tool. */}
               <Link href="/" className="app-brand">
                 {instanceName ? (
                   <>

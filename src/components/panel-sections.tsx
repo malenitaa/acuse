@@ -11,7 +11,7 @@ const STORAGE_KEY = 'acuse-panel-hidden'
 /**
  * The operator decides what their dashboard shows. Sections arrive fully
  * rendered from the server; this component only decides which ones appear,
- * and remembers the choice locally — it's a viewing preference, like the
+ * and remembers the choice locally; it's a viewing preference, like the
  * theme, not data.
  */
 export function PanelSections({

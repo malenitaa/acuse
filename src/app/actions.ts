@@ -60,7 +60,7 @@ export type SendEventState = { error?: 'json' | 'date' | 'endpoint' }
 
 /**
  * Queue an event by hand: for testing an integration, or for scheduling a
- * webhook ("it should go out at 2am; I want to sleep"). No new machinery —
+ * webhook ("it should go out at 2am; I want to sleep"). No new machinery:
  * a scheduled send IS an event whose next_attempt_at hasn't arrived yet,
  * so the existing queue, retries and audit trail all apply.
  */
@@ -96,7 +96,7 @@ export async function sendEventAction(
 }
 
 /**
- * Postpone a pending event's next attempt to a chosen time ("not at 5 am —
+ * Postpone a pending event's next attempt to a chosen time ("not at 5 am,
  * at 7, when I'm awake"). Same lever the scheduler uses: next_attempt_at.
  * Clearing the lock makes the new time authoritative immediately.
  */
@@ -114,7 +114,7 @@ export async function postponeEventAction(formData: FormData) {
 }
 
 /**
- * Archive / restore by hand. Nothing in Acuse is deletable — archiving moves
+ * Archive / restore by hand. Nothing in Acuse is deletable; archiving moves
  * an event out of the operational lists into the browsable archive, and
  * restoring brings it back. Pending events cannot be archived: they are work
  * still owed.

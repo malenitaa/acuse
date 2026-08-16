@@ -11,8 +11,8 @@ automatically with exponential backoff, exhausted ones land in a dead-letter sta
 one-click replay, and a dashboard shows the number that matters: **how many deliveries
 were rescued** that would otherwise have been silently lost.
 
-*Acuse* is Spanish for *acuse de recibo* — acknowledgment of receipt. The UI speaks
-English and Spanish; the whole thing runs on your own infrastructure with one
+*Acuse* is short for *acuse de recibo*, Spanish for acknowledgment of receipt. The UI
+speaks English and Spanish; the whole thing runs on your own infrastructure with one
 `docker compose up`.
 
 ![The Acuse console, «instrument» theme: events rescued, integration health, and the full delivery record](docs/img/console-instrument-dark.png)
@@ -20,49 +20,49 @@ English and Spanish; the whole thing runs on your own infrastructure with one
 <details>
 <summary><strong>Same product, other personalities: «plano» and «ledger»</strong></summary>
 
-![The Acuse console, «plano» theme: a drafting-table blueprint — deep blue, cyan ink, monospace lettering](docs/img/console-plano-dark.png)
+![The Acuse console, «plano» theme: a drafting-table blueprint in deep blue, with cyan ink and monospace lettering](docs/img/console-plano-dark.png)
 
-![The Acuse console, «ledger» theme: a paper ledger on a desk — serif type, ruled sections, rubber-stamp statuses](docs/img/console-ledger-light.png)
+![The Acuse console, «ledger» theme: a paper ledger on a desk, with serif type, ruled sections and rubber-stamp statuses](docs/img/console-ledger-light.png)
 
 </details>
 
 ## The problem
 
 Companies wire their online store to an ERP, web forms to a CRM, billing to accounting.
-Each connection is a URL receiving webhooks. When a destination is down for two minutes —
-a restart, a deploy, a provider hiccup — those webhooks don't come back: the sender
+Each connection is a URL receiving webhooks. When a destination is down for two minutes
+(a restart, a deploy, a provider hiccup), those webhooks don't come back: the sender
 retries a few times, gives up, and discards them. The failure is silent. The sale never
 gets invoiced, the lead never reaches the CRM, and nobody notices until a customer
 complains days later.
 
 ## What you get
 
-- **Durable ingestion** — events are written to Postgres *before* the sender is answered.
+- **Durable ingestion**: events are written to Postgres *before* the sender is answered.
   From that point on they cannot be lost, even if the destination is down for a day.
-- **Automatic retries** — exponential backoff with jitter: 5s, 15s, 45s, 2m, 7m, 20m, 1h.
-- **Early failure detection** — an integration that stops responding is flagged on the
+- **Automatic retries**: exponential backoff with jitter: 5s, 15s, 45s, 2m, 7m, 20m, 1h.
+- **Early failure detection**: an integration that stops responding is flagged on the
   dashboard while its events are still being retried, before anything is lost.
-- **Dead-letter queue with replay** — original payloads are kept, so any event, including
+- **Dead-letter queue with replay**: original payloads are kept, so any event, including
   exhausted ones, can be redelivered with one click.
-- **Full delivery audit trail** — every attempt is recorded: timestamp, status code,
-  response body, duration.
-- **Compose and schedule events** — send a test event to any integration from the
+- **Full delivery audit trail**: every attempt is recorded with timestamp, status code,
+  response body and duration.
+- **Compose and schedule events**: send a test event to any integration from the
   console, or queue one for later ("this must go out at 2 am; I want to sleep"). A
-  scheduled send is simply an event whose delivery time hasn't arrived — same queue,
-  same retries, same audit trail.
-- **Retention that never deletes** — by default everything is kept forever. With
+  scheduled send is simply an event whose delivery time hasn't arrived yet, so the
+  same queue, the same retries and the same audit trail apply.
+- **Retention that never deletes**: by default everything is kept forever. With
   `RETENTION_DAYS` set, delivered events older than that are *archived*: out of the
   operational lists, but browsable under the **Archive** filter and restorable with one
   click. Undelivered events never leave the operational view on their own.
-- **Signed deliveries, [Standard Webhooks](https://www.standardwebhooks.com) compliant**
-  — every request carries `webhook-id`, `webhook-timestamp` and
+- **Signed deliveries, [Standard Webhooks](https://www.standardwebhooks.com) compliant**:
+  every request carries `webhook-id`, `webhook-timestamp` and
   `webhook-signature: v1,<base64>` (HMAC-SHA256 over `id.timestamp.body`), so
   destinations can verify origin and reject replays using any Standard Webhooks
-  library — Svix's SDKs included.
-- **Failure alerts as webhooks** — set `ALERT_WEBHOOK_URL` and every event that exhausts
+  library, Svix's SDKs included.
+- **Failure alerts as webhooks**: set `ALERT_WEBHOOK_URL` and every event that exhausts
   its retries POSTs a JSON alert there. Point it at a chat webhook, an automation-platform trigger, or
   even another Acuse: delivery failures become one more event your tools can route.
-- **Three themes × light/dark** — a sidebar ops console («instrument»), a drafting-table
+- **Three themes × light/dark**: a sidebar ops console («instrument»), a drafting-table
   blueprint («plano»), or a paper ledger («libro»), each in light and dark, following
   your system preference. Bilingual
   UI (English / Spanish). Choices are remembered.
@@ -70,7 +70,7 @@ complains days later.
 ## Run it on your own server (recommended)
 
 All you need is [Docker](https://www.docker.com/products/docker-desktop/). One command
-brings up the app, its Postgres database and the retry worker — no external scheduler,
+brings up the app, its Postgres database and the retry worker. No external scheduler,
 no platform account, and your webhook data never leaves your network:
 
 ```bash
@@ -98,11 +98,11 @@ If you'd rather not run a server: fork this repo, create a Postgres database
 ([Neon](https://neon.tech) free tier works), run [`db/schema.sql`](db/schema.sql) in its
 SQL editor, then import the fork in Vercel with two environment variables:
 
-- `DATABASE_URL` — the Neon connection string.
-- `CRON_SECRET` — a long random string protecting the retry worker.
+- `DATABASE_URL`: the Neon connection string.
+- `CRON_SECRET`: a long random string protecting the retry worker.
 
 The retry schedule ships in [`vercel.json`](vercel.json) (Vercel Cron hits `/api/cron`
-every minute). On serverless the embedded worker stays off — the platform's cron does
+every minute). On serverless the embedded worker stays off; the platform's cron does
 the ticking.
 
 </details>
@@ -120,25 +120,25 @@ Two patterns worth knowing:
 
 - **Instrument both edges of a workflow.** Acuse cannot see inside a workflow engine
   (internal steps are synchronous calls; that's what the engine's own run log is for),
-  but it can watch the edges: one integration for the trigger going *in*, and — as the
-  workflow's final step — an HTTP call to a second integration marking *done*. If "in"
+  but it can watch the edges: one integration for the trigger going *in*, and, as the
+  workflow's final step, an HTTP call to a second integration marking *done*. If "in"
   says 40 and "done" says 37, three runs died inside, and you know exactly which ones.
 - **Route failures to your tools.** With `ALERT_WEBHOOK_URL` set, exhausted events POST
-  a JSON alert wherever you point it — a chat webhook, an automation error-workflow,
+  a JSON alert wherever you point it: a chat webhook, an automation error-workflow,
   or another Acuse.
 
 ## Security
 
 - **Optional console lock**: set `CONSOLE_PASSWORD` and the dashboard requires HTTP
-  Basic Auth (the ingest endpoint stays public by design — that's where webhooks
+  Basic Auth (the ingest endpoint stays public by design; that's where webhooks
   arrive). Without it the console is open: fine for a laptop demo, not for an exposed
   deployment.
 - **Signed outbound deliveries** implementing the
   [Standard Webhooks](https://www.standardwebhooks.com) spec (HMAC-SHA256 over
-  `id.timestamp.body`, `whsec_` secrets, anti-replay tolerance window) — verifiable
+  `id.timestamp.body`, `whsec_` secrets, anti-replay tolerance window), verifiable
   with any compliant library, or with the `verifySignature` helper in
   [`src/lib/signature.ts`](src/lib/signature.ts).
-- **Rate-limited ingestion** (per-key, 600 req/min by default, `429 + Retry-After` —
+- **Rate-limited ingestion** (per-key, 600 req/min by default, `429 + Retry-After`,
   configurable via `INGEST_MAX_PER_MINUTE`).
 - **Destination guard**: only `http(s)` destinations; set `BLOCK_PRIVATE_DESTINATIONS=1`
   to refuse loopback/private/link-local addresses if untrusted operators can create
@@ -159,7 +159,7 @@ Two patterns worth knowing:
 
 Design decisions worth reading in the code:
 
-- Ingestion never delivers inline — one `INSERT`, then respond. Making the sender wait
+- Ingestion never delivers inline: one `INSERT`, then respond. Making the sender wait
   on a third party is how events get dropped.
 - Workers claim events with `FOR UPDATE SKIP LOCKED`, so several can run in parallel
   without double-sending. The embedded worker (`EMBEDDED_WORKER=1`, default in Docker)
@@ -190,15 +190,15 @@ npm run dev
 ```
 
 Generate realistic traffic against the samples (one healthy destination, one that fails
-and recovers — producing the rescued count — and one that's down):
+and recovers, producing the rescued count, and one that's down):
 
 ```bash
 npm run simulate -- --events=70 --seconds=140
 ```
 
-Unit tests cover the core guarantees — backoff bounds and schedule, HMAC signing and
-verification, destination guarding, rate limiting, and i18n parity — using Node's
-built-in test runner (zero extra dependencies):
+Unit tests cover the core guarantees (backoff bounds and schedule, HMAC signing and
+verification, destination guarding, rate limiting, and i18n parity) using Node's
+built-in test runner, with zero extra dependencies:
 
 ```bash
 npm test
@@ -221,7 +221,7 @@ can be replayed with one click.
 **Does it work with any system?** Anything that sends webhooks (HTTP calls) can point at
 Acuse, and anything that accepts HTTP can be a destination.
 
-**Does Acuse ever delete old events?** Never — deleting would betray the whole point.
+**Does Acuse ever delete old events?** Never; deleting would betray the whole point.
 Retention archives instead: old delivered events move out of the way but stay browsable
 and restorable, forever. Your disk is the only limit.
 
@@ -231,7 +231,7 @@ one Postgres, no accounts, MIT license.
 
 ## Author
 
-Built by **Malena** — [github.com/malenitaa](https://github.com/malenitaa).
+Built by [**Malena**](https://github.com/malenitaa).
 
 ## Enjoyed it?
 
@@ -242,4 +242,4 @@ If this was useful and you'd like to support the project:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

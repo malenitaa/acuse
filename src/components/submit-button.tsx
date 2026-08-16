@@ -6,7 +6,7 @@ import { useFormStatus } from 'react-dom'
 /**
  * Submit button for server-action forms. It walks the ledger's own protocol:
  * rest → «procesando…» while the action runs → «✓ done» for a beat, stamped
- * in ledger green — the row is never updated silently, and the receipt is
+ * in ledger green; the row is never updated silently, and the receipt is
  * acknowledged (this is a product called "acuse", after all).
  */
 export function SubmitButton({

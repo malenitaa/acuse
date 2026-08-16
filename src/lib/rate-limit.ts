@@ -3,7 +3,7 @@
  * abuse). In-memory on purpose: acuse is single-process by design, and a
  * limiter that survives restarts would need infrastructure the product
  * doesn't otherwise want. Generous default: webhooks are bursty, and a 429
- * tells well-behaved senders to retry later — they all do.
+ * tells well-behaved senders to retry later, and they all do.
  */
 
 const WINDOW_MS = 60_000

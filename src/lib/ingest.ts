@@ -27,7 +27,7 @@ export type IngestOutcome = {
 /**
  * The hot path. Everything here happens before the sender gets its 200, so it
  * stays deliberately small: one INSERT, no delivery attempt, no outbound HTTP.
- * A slow ingest is how you lose events — senders time out and give up.
+ * A slow ingest is how you lose events: senders time out and give up.
  */
 export async function receiveEvent(args: {
   endpoint: Endpoint

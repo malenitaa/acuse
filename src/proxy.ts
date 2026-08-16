@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from 'next/server'
  * machine endpoints keep their own protections and stay out of the matcher:
  * ingest is public by design, cron checks CRON_SECRET, demo-sink is a demo
  * target. Without the variable, behavior is unchanged (open console for
- * local demos) — the README tells deployers to set it.
+ * local demos); the README tells deployers to set it.
  */
 
 /** Constant-time-ish comparison; the edge runtime has no timingSafeEqual. */

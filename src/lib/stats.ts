@@ -21,7 +21,7 @@ export async function getStats(): Promise<Stats> {
 /**
  * Health is derived from the queue, not from a heartbeat. An integration that
  * has quietly stopped working looks exactly like a healthy one from the
- * outside — the only tell is that events are piling up behind it.
+ * outside; the only tell is that events are piling up behind it.
  */
 export async function getEndpointHealth(): Promise<EndpointHealth[]> {
   const rows = await query<Omit<EndpointHealth, 'health'>>(

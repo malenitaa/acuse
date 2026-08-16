@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 /**
  * A stand-in for a customer's real destination, used only by the demo data.
  *
- * Real integrations fail in specific, boring ways — a server that is down, one
+ * Real integrations fail in specific, boring ways: a server that is down, one
  * that is flaky and recovers, one that hangs. This reproduces those on demand
  * so the console shows a believable day instead of a green wall of nothing.
  *

@@ -104,7 +104,7 @@ async function sendOnce(job: DeliveryJob, attemptNumber: number) {
  * Deliver one claimed event and record what happened, win or lose.
  *
  * The attempt row is written before the event row is updated. If the process
- * dies between the two, the lease expires and the event is retried — a
+ * dies between the two, the lease expires and the event is retried: a
  * duplicate delivery is recoverable, a silently dropped event is not.
  */
 export async function deliverEvent(
@@ -192,7 +192,7 @@ export async function drainQueue(limit = 50): Promise<DrainSummary> {
   const jobs = await claimDueEvents(limit)
 
   // Destinations are independent, so there is no reason to wait on them in
-  // turn — one slow endpoint would stall every other endpoint's queue.
+  // turn; one slow endpoint would stall every other endpoint's queue.
   const results = await Promise.all(jobs.map((job) => deliverEvent(job)))
 
   return {

@@ -2,12 +2,12 @@
  * Outbound failure alerts, error-workflow style: when an event exhausts
  * its retries and lands in the dead-letter state, POST a JSON alert to
  * ALERT_WEBHOOK_URL (if set). Point it at a chat webhook, an automation-platform trigger, or
- * even another Acuse integration — a delivery failure becomes just another
+ * even another Acuse integration: a delivery failure becomes just another
  * webhook your tools can route.
  *
  * Fire-and-forget by design: an alert must never slow down or break a
  * delivery pass. If the alert URL is down, the failure is logged and life
- * goes on — the dead event itself is already safely parked in the console.
+ * goes on; the dead event itself is already safely parked in the console.
  */
 
 const ALERT_TIMEOUT_MS = 5_000

@@ -6,7 +6,7 @@ const SCHEMES = ['light', 'dark'] as const
 
 type Scheme = (typeof SCHEMES)[number]
 
-// U+FE0E forces the text (monochrome) glyph — without it the sun renders as
+// U+FE0E forces the text (monochrome) glyph; without it the sun renders as
 // a full-color emoji next to the plain-text moon.
 const GLYPHS: Record<Scheme, string> = { light: '☀︎', dark: '☾' }
 
