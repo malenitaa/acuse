@@ -169,6 +169,14 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* On narrow screens long names wrap and rows grow tall; middle-aligned cells
+ * then scatter badges at ragged heights. Anchoring every cell to the top
+ * keeps each row reading as one line of the record. */
+td,
+th {
+  vertical-align: top;
+}
+
 /* Keyboard focus in the theme's accent; mouse clicks stay unmarked. */
 :focus-visible {
   outline: 2px solid var(--color-accent);
