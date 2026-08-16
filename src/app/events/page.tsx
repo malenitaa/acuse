@@ -1,16 +1,11 @@
 import Link from 'next/link'
 import { BackStrip, Empty, Section, SectionTitle, Sheet, StatusPill } from '@/components/ui'
 import { timeAgo, truncate } from '@/lib/format'
+import { dict } from '@/lib/i18n'
+import { getLang } from '@/lib/lang'
 import { listEvents } from '@/lib/stats'
 
 export const dynamic = 'force-dynamic'
-
-const FILTERS = [
-  { value: 'all', label: 'Todos' },
-  { value: 'pending', label: 'En reintento' },
-  { value: 'dead', label: 'Sin entregar' },
-  { value: 'delivered', label: 'Entregados' },
-]
 
 export default async function EventsPage({
   searchParams,
@@ -18,17 +13,25 @@ export default async function EventsPage({
   searchParams: Promise<{ status?: string }>
 }) {
   const { status = 'all' } = await searchParams
-  const events = await listEvents({ status, limit: 200 })
+  const [lang, events] = await Promise.all([getLang(), listEvents({ status, limit: 200 })])
+  const t = dict[lang]
+
+  const filters = [
+    { value: 'all', label: t.events.filterAll },
+    { value: 'pending', label: t.events.filterPending },
+    { value: 'dead', label: t.events.filterDead },
+    { value: 'delivered', label: t.events.filterDelivered },
+  ]
 
   return (
     <Sheet>
-      <BackStrip href="/">volver al panel</BackStrip>
+      <BackStrip href="/">{t.events.back}</BackStrip>
 
       <Section>
         <SectionTitle
           aside={
             <div className="flex gap-3">
-              {FILTERS.map((filter) => (
+              {filters.map((filter) => (
                 <Link
                   key={filter.value}
                   href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
@@ -44,21 +47,21 @@ export default async function EventsPage({
             </div>
           }
         >
-          Eventos
+          {t.events.title}
         </SectionTitle>
 
         {events.length === 0 ? (
-          <Empty>No hay eventos con ese estado.</Empty>
+          <Empty>{t.events.empty}</Empty>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
             <thead className="text-[11px] uppercase tracking-[0.08em] text-faint">
               <tr className="border-b border-line-soft">
-                <th className="px-6 py-2 text-left font-medium">Evento</th>
-                <th className="px-6 py-2 text-left font-medium">Integración</th>
-                <th className="px-6 py-2 text-left font-medium">Estado</th>
-                <th className="px-6 py-2 text-right font-medium">Intentos</th>
-                <th className="px-6 py-2 text-right font-medium">Recibido</th>
+                <th className="px-6 py-2 text-left font-medium">{t.events.colEvent}</th>
+                <th className="px-6 py-2 text-left font-medium">{t.events.colIntegration}</th>
+                <th className="px-6 py-2 text-left font-medium">{t.events.colStatus}</th>
+                <th className="px-6 py-2 text-right font-medium">{t.events.colAttempts}</th>
+                <th className="px-6 py-2 text-right font-medium">{t.events.colReceived}</th>
               </tr>
             </thead>
             <tbody>
@@ -77,13 +80,13 @@ export default async function EventsPage({
                   </td>
                   <td className="px-6 py-2.5 text-muted">{event.endpoint_name}</td>
                   <td className="px-6 py-2.5">
-                    <StatusPill status={event.status} attempts={event.attempt_count} />
+                    <StatusPill status={event.status} attempts={event.attempt_count} lang={lang} />
                   </td>
                   <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-faint">
                     {event.attempt_count}
                   </td>
                   <td className="px-6 py-2.5 text-right text-faint">
-                    {timeAgo(event.received_at)}
+                    {timeAgo(event.received_at, lang)}
                   </td>
                 </tr>
               ))}

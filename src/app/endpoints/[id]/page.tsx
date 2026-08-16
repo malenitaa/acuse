@@ -13,6 +13,8 @@ import {
   Totals,
 } from '@/components/ui'
 import { formatPercent, timeAgo, truncate } from '@/lib/format'
+import { dict } from '@/lib/i18n'
+import { getLang } from '@/lib/lang'
 import { retryScheduleLabels } from '@/lib/retry'
 import { getEndpoint, listEvents } from '@/lib/stats'
 
@@ -20,8 +22,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function EndpointPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const endpoint = await getEndpoint(id)
+  const [lang, endpoint] = await Promise.all([getLang(), getEndpoint(id)])
   if (!endpoint) notFound()
+  const t = dict[lang]
 
   const events = await listEvents({ endpointId: endpoint.id, limit: 40 })
   const appUrl = process.env.APP_URL ?? 'http://localhost:3000'
@@ -29,48 +32,49 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
 
   return (
     <Sheet>
-      <BackStrip href="/">volver al panel</BackStrip>
+      <BackStrip href="/">{t.events.back}</BackStrip>
 
       <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-serif text-xl font-semibold tracking-tight">{endpoint.name}</h1>
             <div className="mt-1.5">
-              <HealthBadge health={endpoint.health} />
+              <HealthBadge health={endpoint.health} lang={lang} />
             </div>
           </div>
           <form action={toggleEndpointAction}>
             <input type="hidden" name="endpointId" value={endpoint.id} />
-            <SubmitButton>{endpoint.paused ? 'Reanudar entregas' : 'Pausar entregas'}</SubmitButton>
+            <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.actions.done}>
+              {endpoint.paused ? t.actions.resume : t.actions.pause}
+            </SubmitButton>
           </form>
         </div>
 
         <div className="mt-5 space-y-3">
-          <UrlLine label="Le pasás esta URL al que manda el webhook">
+          <UrlLine label={t.endpoint.ingestLabel}>
             {appUrl}/api/i/{endpoint.ingest_key}
           </UrlLine>
-          <UrlLine label="Y nosotros entregamos acá">{endpoint.destination_url}</UrlLine>
+          <UrlLine label={t.endpoint.deliverLabel}>{endpoint.destination_url}</UrlLine>
         </div>
 
         <p className="mt-5 text-[12px] italic leading-relaxed text-faint">
-          Si el destino no contesta, reintentamos {endpoint.max_attempts} veces separando cada
-          intento: {schedule.join(' · ')}. Después queda marcado como sin entregar y esperando a
-          una persona.
+          {t.endpoint.retrySentence(endpoint.max_attempts, schedule.join(' · '))}
         </p>
       </Section>
 
       <Totals
+        lang={lang}
         items={[
-          { label: 'Recibidos', value: endpoint.total },
+          { label: t.endpoint.received, value: endpoint.total },
           {
-            label: 'Entregados',
+            label: t.endpoint.delivered,
             value: endpoint.delivered,
             hint: formatPercent(endpoint.delivered, endpoint.total),
             tone: 'good',
           },
-          { label: 'Rescatados', value: endpoint.recovered, tone: 'good' },
+          { label: t.endpoint.rescued, value: endpoint.recovered, tone: 'good' },
           {
-            label: 'Sin entregar',
+            label: t.endpoint.dead,
             value: endpoint.dead,
             tone: endpoint.dead > 0 ? 'bad' : 'neutral',
           },
@@ -78,9 +82,9 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
       />
 
       <Section>
-        <SectionTitle>Eventos de esta integración</SectionTitle>
+        <SectionTitle>{t.endpoint.eventsTitle}</SectionTitle>
         {events.length === 0 ? (
-          <Empty>Todavía no llegó ningún evento acá.</Empty>
+          <Empty>{t.endpoint.empty}</Empty>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
@@ -99,13 +103,13 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
                     </Link>
                   </td>
                   <td className="px-6 py-2.5">
-                    <StatusPill status={event.status} attempts={event.attempt_count} />
+                    <StatusPill status={event.status} attempts={event.attempt_count} lang={lang} />
                   </td>
                   <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-faint">
-                    {event.attempt_count} int.
+                    {t.endpoint.attemptsShort(event.attempt_count)}
                   </td>
                   <td className="px-6 py-2.5 text-right text-faint">
-                    {timeAgo(event.received_at)}
+                    {timeAgo(event.received_at, lang)}
                   </td>
                 </tr>
               ))}

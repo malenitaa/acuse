@@ -1,7 +1,7 @@
 # Acuse
 
 Guardián de webhooks: ningún evento se pierde.
-*Webhook delivery guardian for self-hosting — no event gets lost. Spanish-first UI.*
+*Webhook delivery guardian for self-hosting — no event gets lost. Bilingual UI (EN/ES).*
 
 ---
 
@@ -33,6 +33,8 @@ de que se pierda algo. Y te muestra el número que importa: cuántos avisos resc
   destino, cuánto tardó. Si algo agotó los reintentos, un botón lo reenvía a mano.
 - **Dos temas a elección** (arriba a la derecha): «instrumento», una consola oscura a
   pantalla completa, o «libro», un libro contable en papel. El panel recuerda tu elección.
+- **Dos idiomas**: la interfaz habla inglés (por defecto) y castellano, con un selector
+  en el header. La elección también se recuerda.
 
 ## Instalarlo en tu empresa
 

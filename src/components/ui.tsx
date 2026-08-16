@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatNumber } from '@/lib/format'
+import { dict, type Lang } from '@/lib/i18n'
 import type { EndpointHealth, EventStatus } from '@/lib/types'
 
 /**
@@ -52,7 +53,7 @@ const TONE_TEXT = {
 /** Ledger totals: label, dot leader, figure — the way a sum line is written.
  * Columns follow the container (the theme decides how wide that is), not the
  * viewport: 2-up on the «libro» sheet, 4-up on the full-width «instrumento». */
-export function Totals({ items }: { items: TotalItem[] }) {
+export function Totals({ items, lang = 'es' }: { items: TotalItem[]; lang?: Lang }) {
   return (
     <div className="grid grid-cols-1 gap-x-10 gap-y-3 px-6 py-5 @2xl:grid-cols-2 @6xl:grid-cols-4">
       {items.map((item) => (
@@ -61,7 +62,7 @@ export function Totals({ items }: { items: TotalItem[] }) {
             <span className="text-muted">{item.label}</span>
             <span aria-hidden className="flex-1 border-b border-dotted border-line" />
             <span className={`tnum font-mono text-[15px] font-medium ${TONE_TEXT[item.tone ?? 'neutral']}`}>
-              {typeof item.value === 'number' ? formatNumber(item.value) : item.value}
+              {typeof item.value === 'number' ? formatNumber(item.value, lang) : item.value}
             </span>
           </div>
           {item.hint ? (
@@ -73,39 +74,52 @@ export function Totals({ items }: { items: TotalItem[] }) {
   )
 }
 
-const STATUS_STYLES: Record<EventStatus, { label: string; className: string }> = {
-  delivered: { label: 'entregado', className: 'border-good/70 text-good' },
-  pending: { label: 'reintentando', className: 'border-warn/70 text-warn' },
-  dead: { label: 'sin entregar', className: 'border-bad/70 text-bad' },
+const STATUS_STYLES: Record<EventStatus, string> = {
+  delivered: 'border-good/70 text-good',
+  pending: 'border-warn/70 text-warn',
+  dead: 'border-bad/70 text-bad',
 }
 
 /** Rendered as a rubber stamp: bordered, uppercase, no fill. */
-export function StatusPill({ status, attempts }: { status: EventStatus; attempts?: number }) {
-  const style = STATUS_STYLES[status]
-  const label = status === 'pending' && attempts === 0 ? 'en cola' : style.label
+export function StatusPill({
+  status,
+  attempts,
+  lang = 'es',
+}: {
+  status: EventStatus
+  attempts?: number
+  lang?: Lang
+}) {
+  const label =
+    status === 'pending' && attempts === 0 ? dict[lang].status.queued : dict[lang].status[status]
 
   return (
     <span
-      className={`inline-flex items-center border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.1em] ${style.className}`}
+      className={`inline-flex items-center border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.1em] ${STATUS_STYLES[status]}`}
     >
       {label}
     </span>
   )
 }
 
-const HEALTH_STYLES: Record<EndpointHealth['health'], { label: string; text: string }> = {
-  healthy: { label: 'sano', text: 'text-good' },
-  degraded: { label: 'inestable', text: 'text-warn' },
-  down: { label: 'caído', text: 'text-bad' },
-  idle: { label: 'sin tráfico', text: 'text-faint' },
+const HEALTH_STYLES: Record<EndpointHealth['health'], string> = {
+  healthy: 'text-good',
+  degraded: 'text-warn',
+  down: 'text-bad',
+  idle: 'text-faint',
 }
 
-export function HealthBadge({ health }: { health: EndpointHealth['health'] }) {
-  const style = HEALTH_STYLES[health]
+export function HealthBadge({
+  health,
+  lang = 'es',
+}: {
+  health: EndpointHealth['health']
+  lang?: Lang
+}) {
   return (
-    <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium ${style.text}`}>
+    <span className={`inline-flex items-center gap-1.5 text-[12px] font-medium ${HEALTH_STYLES[health]}`}>
       <span aria-hidden className="inline-block size-1.5 bg-current" />
-      {style.label}
+      {dict[lang].health[health]}
     </span>
   )
 }

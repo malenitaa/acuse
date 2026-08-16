@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { replayEventAction } from '@/app/actions'
 import { BackStrip, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { formatTimestamp, timeAgo } from '@/lib/format'
+import { dict, type Lang } from '@/lib/i18n'
+import { getLang } from '@/lib/lang'
 import { getAttempts, getEvent } from '@/lib/stats'
 import type { Attempt } from '@/lib/types'
 
@@ -10,21 +12,22 @@ export const dynamic = 'force-dynamic'
 
 export default async function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const event = await getEvent(id)
+  const [lang, event] = await Promise.all([getLang(), getEvent(id)])
   if (!event) notFound()
+  const t = dict[lang]
 
   const attempts = await getAttempts(event.id)
 
   return (
     <Sheet>
-      <BackStrip href="/">volver al panel</BackStrip>
+      <BackStrip href="/">{t.events.back}</BackStrip>
 
       <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="font-mono text-[13px] text-muted">{event.id}</div>
             <div className="mt-2 flex items-center gap-3">
-              <StatusPill status={event.status} attempts={event.attempt_count} />
+              <StatusPill status={event.status} attempts={event.attempt_count} lang={lang} />
               <Link
                 href={`/endpoints/${event.endpoint_id}`}
                 className="text-[13px] text-muted hover:text-accent"
@@ -37,25 +40,26 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             <input type="hidden" name="eventId" value={event.id} />
             <SubmitButton
               variant={event.status === 'dead' ? 'primary' : 'ghost'}
-              doneLabel="reenviado"
+              pendingLabel={t.actions.processing}
+              doneLabel={t.actions.redelivered}
             >
-              Reenviar ahora
+              {t.actions.redeliver}
             </SubmitButton>
           </form>
         </div>
 
         <dl className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3 text-[12px] sm:grid-cols-4">
-          <Field label="Recibido" value={formatTimestamp(event.received_at)} />
+          <Field label={t.event.received} value={formatTimestamp(event.received_at, lang)} />
           <Field
-            label="Entregado"
-            value={event.delivered_at ? formatTimestamp(event.delivered_at) : '—'}
+            label={t.event.delivered}
+            value={event.delivered_at ? formatTimestamp(event.delivered_at, lang) : '—'}
           />
-          <Field label="Intentos" value={String(event.attempt_count)} />
+          <Field label={t.event.attempts} value={String(event.attempt_count)} />
           <Field
-            label={event.status === 'pending' ? 'Próximo intento' : 'Último error'}
+            label={event.status === 'pending' ? t.event.nextAttempt : t.event.lastError}
             value={
               event.status === 'pending'
-                ? timeAgo(event.next_attempt_at)
+                ? timeAgo(event.next_attempt_at, lang)
                 : (event.last_error ?? '—')
             }
           />
@@ -63,22 +67,22 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
       </Section>
 
       <Section>
-        <SectionTitle>Intentos de entrega</SectionTitle>
+        <SectionTitle>{t.event.attemptsTitle}</SectionTitle>
         {attempts.length === 0 ? (
           <div className="px-6 py-8 text-center font-serif text-[14px] italic text-faint">
-            Todavía no se intentó entregar. El evento ya está guardado.
+            {t.event.noAttempts}
           </div>
         ) : (
           <ol className="divide-y divide-line-soft">
             {attempts.map((attempt) => (
-              <AttemptRow key={attempt.id} attempt={attempt} />
+              <AttemptRow key={attempt.id} attempt={attempt} lang={lang} />
             ))}
           </ol>
         )}
       </Section>
 
       <Section>
-        <SectionTitle>Contenido recibido</SectionTitle>
+        <SectionTitle>{t.event.payloadTitle}</SectionTitle>
         <pre className="overflow-x-auto px-6 py-4 font-mono text-[12px] leading-relaxed text-muted">
           {JSON.stringify(event.payload, null, 2)}
         </pre>
@@ -87,7 +91,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   )
 }
 
-function AttemptRow({ attempt }: { attempt: Attempt }) {
+function AttemptRow({ attempt, lang }: { attempt: Attempt; lang: Lang }) {
+  const t = dict[lang]
   const ok = attempt.outcome === 'success'
 
   return (
@@ -100,9 +105,9 @@ function AttemptRow({ attempt }: { attempt: Attempt }) {
         {attempt.n}
       </span>
       <span className={`tnum font-mono text-[13px] font-medium ${ok ? 'text-good' : 'text-bad'}`}>
-        {attempt.status_code ? `HTTP ${attempt.status_code}` : 'sin respuesta'}
+        {attempt.status_code ? `HTTP ${attempt.status_code}` : t.event.noResponse}
       </span>
-      <span className="text-[12px] text-faint">{formatTimestamp(attempt.started_at)}</span>
+      <span className="text-[12px] text-faint">{formatTimestamp(attempt.started_at, lang)}</span>
       <span className="tnum text-[12px] text-faint">{attempt.duration_ms}ms</span>
       {attempt.manual ? (
         <span className="border border-line px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-faint">
