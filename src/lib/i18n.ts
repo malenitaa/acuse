@@ -107,6 +107,16 @@ const es = {
     payloadTitle: 'Contenido recibido',
     noResponse: 'sin respuesta',
   },
+  onboarding: {
+    title: '¿Cómo empiezo?',
+    step1: 'Creá una integración: un nombre y la URL de destino adonde hay que entregar cada aviso.',
+    step2:
+      'Acuse te da una URL de ingreso. Pegala en el sistema que emite los webhooks (Albato, Shopify, Stripe, un formulario…) en lugar del destino directo.',
+    step3:
+      'Listo: cada aviso que llegue se guarda antes de responder, se entrega con reintentos, y este panel te avisa si algo se cae — antes de que se pierda nada.',
+    cta: 'Crear la primera integración',
+    demoHint: 'Para llenar el panel con datos de ejemplo, en la terminal:',
+  },
   newEndpoint: {
     title: 'Nueva integración',
     dashboardLink: '+ nueva integración',
@@ -233,6 +243,16 @@ const en: typeof es = {
     noAttempts: 'No delivery attempted yet. The event is already stored.',
     payloadTitle: 'Received payload',
     noResponse: 'no response',
+  },
+  onboarding: {
+    title: 'How do I start?',
+    step1: 'Create an integration: a name and the destination URL where each event must be delivered.',
+    step2:
+      'Acuse hands you an ingest URL. Paste it into the system that emits the webhooks (Albato, Shopify, Stripe, a form backend…) in place of the direct destination.',
+    step3:
+      'Done: every incoming event is stored before answering, delivered with retries, and this dashboard warns you when something breaks — before anything is lost.',
+    cta: 'Create the first integration',
+    demoHint: 'To fill the dashboard with sample data, in a terminal:',
   },
   newEndpoint: {
     title: 'New integration',

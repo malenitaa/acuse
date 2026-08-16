@@ -90,9 +90,7 @@ export default async function DashboardPage() {
           {t.dashboard.integrations}
         </SectionTitle>
         {endpoints.length === 0 ? (
-          <Empty>
-            {t.dashboard.emptyIntegrations} <code className="font-mono">npm run seed</code>.
-          </Empty>
+          <Onboarding lang={lang} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
@@ -254,6 +252,34 @@ function CompositionBar({ stats, lang }: { stats: Stats; lang: Lang }) {
           </span>
         ))}
       </div>
+    </div>
+  )
+}
+
+/**
+ * What a fresh install shows instead of an empty table: the three steps of
+ * the whole product, in the operator's language, with the door to step one.
+ * The npm hint stays as a smaller aside for people evaluating the demo.
+ */
+function Onboarding({ lang }: { lang: Lang }) {
+  const t = dict[lang].onboarding
+  return (
+    <div className="px-6 py-8">
+      <h3 className="font-serif text-[16px] font-semibold">{t.title}</h3>
+      <ol className="mt-4 max-w-xl list-decimal space-y-3 pl-5 text-[13px] leading-relaxed text-muted">
+        <li>{t.step1}</li>
+        <li>{t.step2}</li>
+        <li>{t.step3}</li>
+      </ol>
+      <Link
+        href="/endpoints/new"
+        className="mt-5 inline-block border border-text px-3 py-1.5 text-[12px] font-semibold transition-colors hover:bg-text hover:text-panel"
+      >
+        {t.cta}
+      </Link>
+      <p className="mt-5 text-[11px] italic text-faint">
+        {t.demoHint} <code className="font-mono not-italic">npm run seed && npm run simulate</code>
+      </p>
     </div>
   )
 }

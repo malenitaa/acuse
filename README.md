@@ -83,6 +83,26 @@ the ticking.
 
 </details>
 
+## Using it
+
+1. **Create an integration** (*+ new integration* on the dashboard): a name and the
+   destination URL where events must be delivered.
+2. **Paste the ingest URL** Acuse gives you into the system that emits the webhooks
+   (Albato, Shopify, Stripe, a form backend…), in place of the direct destination.
+3. **Read the dashboard**: health per integration, every event with its full attempt
+   trail, and one-click replay for anything that exhausted its retries.
+
+Two patterns worth knowing:
+
+- **Instrument both edges of a workflow.** Acuse cannot see inside a workflow engine
+  (internal steps are synchronous calls; that's what the engine's own run log is for),
+  but it can watch the edges: one integration for the trigger going *in*, and — as the
+  workflow's final step — an HTTP call to a second integration marking *done*. If "in"
+  says 40 and "done" says 37, three runs died inside, and you know exactly which ones.
+- **Route failures to your tools.** With `ALERT_WEBHOOK_URL` set, exhausted events POST
+  a JSON alert wherever you point it — a Slack webhook, an n8n/Albato error workflow,
+  or another Acuse.
+
 ## Security
 
 - **Optional console lock**: set `CONSOLE_PASSWORD` and the dashboard requires HTTP
