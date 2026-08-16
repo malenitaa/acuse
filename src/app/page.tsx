@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { processQueueAction } from './actions'
 import { AutoRefresh } from '@/components/auto-refresh'
+import { PanelSections } from '@/components/panel-sections'
 import {
   Empty,
   HealthBadge,
@@ -31,14 +32,15 @@ export default async function DashboardPage() {
 
   const broken = endpoints.filter((endpoint) => endpoint.health === 'down')
 
-  return (
-    <Sheet>
-      <AutoRefresh />
+  const numberSection = (
+    <div className="divide-y divide-line">
       <Headline stats={stats} lang={lang} />
-
       {broken.length > 0 ? <MarginNote names={broken.map((e) => e.name)} lang={lang} /> : null}
+    </div>
+  )
 
-      <Totals
+  const totalsSection = (
+    <Totals
         lang={lang}
         items={[
           { label: t.dashboard.received, value: stats.received },
@@ -64,7 +66,9 @@ export default async function DashboardPage() {
           },
         ]}
       />
+  )
 
+  const integrationsSection = (
       <Section>
         <SectionTitle
           aside={
@@ -146,7 +150,9 @@ export default async function DashboardPage() {
           </div>
         )}
       </Section>
+  )
 
+  const latestSection = (
       <Section>
         <SectionTitle
           aside={
@@ -195,6 +201,26 @@ export default async function DashboardPage() {
           </div>
         )}
       </Section>
+  )
+
+  return (
+    <Sheet>
+      <AutoRefresh />
+      <PanelSections
+        customizeLabel={t.dashboard.customize}
+        labels={{
+          number: t.dashboard.sectionNumber,
+          totals: t.dashboard.sectionTotals,
+          integrations: t.dashboard.integrations,
+          latest: t.dashboard.latestEvents,
+        }}
+        sections={{
+          number: numberSection,
+          totals: totalsSection,
+          integrations: integrationsSection,
+          latest: latestSection,
+        }}
+      />
     </Sheet>
   )
 }

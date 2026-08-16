@@ -166,6 +166,90 @@ body {
 
 /* ---------- App shell: console vs. sheet ---------- */
 
+/* Navigation strip under the header: in «instrumento» a console tab row, in
+ * «libro» the book's own index line. */
+.app-nav {
+  display: flex;
+  gap: 1.25rem;
+  padding: 0.5rem 1.5rem;
+  border-bottom: 1px solid var(--color-line-soft);
+  font-size: 12px;
+}
+
+.app-nav a {
+  color: var(--color-faint);
+  transition: color 150ms ease;
+}
+
+.app-nav a:hover {
+  color: var(--color-muted);
+}
+
+.app-nav a[aria-current='page'] {
+  color: var(--color-text);
+}
+
+[data-theme='libro'] .app-nav {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* «Personalizar» dropdown on the dashboard. */
+.panel-config {
+  position: relative;
+}
+
+.panel-config summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-faint);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ctl);
+  padding: 2px 10px;
+  transition: color 150ms ease;
+}
+
+.panel-config summary::-webkit-details-marker {
+  display: none;
+}
+
+.panel-config summary:hover,
+.panel-config[open] summary {
+  color: var(--color-text);
+}
+
+.panel-config-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ctl);
+  background: var(--color-panel);
+  padding: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.panel-config-menu label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2px 4px;
+  font-size: 12px;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.panel-config-menu input {
+  accent-color: var(--color-accent);
+}
+
 /* «instrumento»: full-width console — top bar, content using the screen,
  * capped only on ultrawide monitors. */
 .app-frame {

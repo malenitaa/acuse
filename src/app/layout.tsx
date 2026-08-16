@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Script from 'next/script'
 import { LangToggle } from '@/components/lang-toggle'
 import { SchemeToggle } from '@/components/scheme-toggle'
+import { ShellNav } from '@/components/shell-nav'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
@@ -55,6 +56,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </Link>
             <p className="app-tagline">{t.shell.tagline}</p>
           </header>
+          <ShellNav
+            items={[
+              { href: '/', label: t.shell.navDashboard },
+              { href: '/events', label: t.shell.navEvents },
+              { href: '/endpoints/new', label: t.shell.navNew },
+            ]}
+          />
           <main className="app-main">{children}</main>
           <footer className="app-footer">
             {t.shell.demoNote} <code className="font-mono text-muted">npm run simulate</code>
