@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { replayEventAction } from '@/app/actions'
+import { archiveEventAction, replayEventAction, unarchiveEventAction } from '@/app/actions'
 import { BackStrip, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { formatTimestamp, timeAgo } from '@/lib/format'
 import { dict, type Lang } from '@/lib/i18n'
@@ -36,17 +36,42 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
               </Link>
             </div>
           </div>
-          <form action={replayEventAction}>
-            <input type="hidden" name="eventId" value={event.id} />
-            <SubmitButton
-              variant={event.status === 'dead' ? 'primary' : 'ghost'}
-              pendingLabel={t.actions.processing}
-              doneLabel={t.actions.redelivered}
-            >
-              {t.actions.redeliver}
-            </SubmitButton>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <form action={replayEventAction}>
+              <input type="hidden" name="eventId" value={event.id} />
+              <SubmitButton
+                variant={event.status === 'dead' ? 'primary' : 'ghost'}
+                pendingLabel={t.actions.processing}
+                doneLabel={t.actions.redelivered}
+              >
+                {t.actions.redeliver}
+              </SubmitButton>
+            </form>
+            {/* Keys keep React from recycling one form's SubmitButton (and its
+                «✓ done» flash) into the other when the branch flips. */}
+            {event.archived_at ? (
+              <form key="restore" action={unarchiveEventAction}>
+                <input type="hidden" name="eventId" value={event.id} />
+                <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.events.restored}>
+                  {t.events.restore}
+                </SubmitButton>
+              </form>
+            ) : event.status !== 'pending' ? (
+              <form key="archive" action={archiveEventAction}>
+                <input type="hidden" name="eventId" value={event.id} />
+                <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.actions.done}>
+                  {t.events.archive}
+                </SubmitButton>
+              </form>
+            ) : null}
+          </div>
         </div>
+
+        {event.archived_at ? (
+          <p className="mt-4 max-w-xl text-[12px] italic leading-relaxed text-faint">
+            ☞ {t.events.archivedNote}
+          </p>
+        ) : null}
 
         <dl className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3 text-[12px] sm:grid-cols-4">
           <Field label={t.event.received} value={formatTimestamp(event.received_at, lang)} />

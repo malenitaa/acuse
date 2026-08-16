@@ -1,4 +1,5 @@
 import { drainQueue } from './delivery'
+import { archiveOldEvents } from './retention'
 
 const INTERVAL_MS = 30_000
 
@@ -26,6 +27,7 @@ export function startEmbeddedWorker() {
           `[acuse] worker pass: ${summary.claimed} claimed, ${summary.delivered} delivered, ${summary.failed} failed`,
         )
       }
+      await archiveOldEvents()
     } catch (error) {
       console.error('[acuse] worker pass failed:', error)
     }

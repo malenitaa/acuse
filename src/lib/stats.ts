@@ -72,9 +72,16 @@ export async function listEvents(options: {
     params.push(options.endpointId)
     conditions.push(`e.endpoint_id = $${params.length}`)
   }
-  if (options.status && options.status !== 'all') {
-    params.push(options.status)
-    conditions.push(`e.status = $${params.length}`)
+  // Operational lists hide archived events; the «archived» pseudo-status IS
+  // the archive browser. Lifetime totals (getStats) keep counting everything.
+  if (options.status === 'archived') {
+    conditions.push('e.archived_at is not null')
+  } else {
+    conditions.push('e.archived_at is null')
+    if (options.status && options.status !== 'all') {
+      params.push(options.status)
+      conditions.push(`e.status = $${params.length}`)
+    }
   }
 
   params.push(options.limit ?? 50)

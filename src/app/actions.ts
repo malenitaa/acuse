@@ -95,6 +95,31 @@ export async function sendEventAction(
   return {}
 }
 
+/**
+ * Archive / restore by hand. Nothing in Acuse is deletable — archiving moves
+ * an event out of the operational lists into the browsable archive, and
+ * restoring brings it back. Pending events cannot be archived: they are work
+ * still owed.
+ */
+export async function archiveEventAction(formData: FormData) {
+  const eventId = String(formData.get('eventId') ?? '')
+  if (eventId) {
+    await query(
+      `update events set archived_at = now() where id = $1 and status <> 'pending'`,
+      [eventId],
+    )
+  }
+  refresh()
+}
+
+export async function unarchiveEventAction(formData: FormData) {
+  const eventId = String(formData.get('eventId') ?? '')
+  if (eventId) {
+    await query(`update events set archived_at = null where id = $1`, [eventId])
+  }
+  refresh()
+}
+
 export async function toggleEndpointAction(formData: FormData) {
   const endpointId = String(formData.get('endpointId') ?? '')
   if (endpointId) {

@@ -25,6 +25,7 @@ export type EventRow = {
   delivered_at: Date | null
   last_error: string | null
   locked_at: Date | null
+  archived_at: Date | null
 }
 
 export type Attempt = {

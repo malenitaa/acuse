@@ -35,6 +35,8 @@ services:
       # ALERT_WEBHOOK_URL: https://hooks.example.com/acuse-alerts
       # Per-client branding: the header reads «Acuse · <name>»:
       # INSTANCE_NAME: Empresa X
+      # Archive (never delete) delivered events older than N days:
+      # RETENTION_DAYS: '90'
     depends_on:
       db:
         condition: service_healthy

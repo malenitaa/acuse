@@ -39,6 +39,10 @@ complains days later.
   console, or queue one for later ("this must go out at 2 am; I want to sleep"). A
   scheduled send is simply an event whose delivery time hasn't arrived — same queue,
   same retries, same audit trail.
+- **Retention that never deletes** — by default everything is kept forever. With
+  `RETENTION_DAYS` set, delivered events older than that are *archived*: out of the
+  operational lists, but browsable under the **Archive** filter and restorable with one
+  click. Undelivered events never leave the operational view on their own.
 - **Signed deliveries, [Standard Webhooks](https://www.standardwebhooks.com) compliant**
   — every request carries `webhook-id`, `webhook-timestamp` and
   `webhook-signature: v1,<base64>` (HMAC-SHA256 over `id.timestamp.body`), so
@@ -204,6 +208,10 @@ can be replayed with one click.
 
 **Does it work with any system?** Anything that sends webhooks (HTTP calls) can point at
 Acuse, and anything that accepts HTTP can be a destination.
+
+**Does Acuse ever delete old events?** Never — deleting would betray the whole point.
+Retention archives instead: old delivered events move out of the way but stay browsable
+and restorable, forever. Your disk is the only limit.
 
 **How does it compare to Svix or Hookdeck?** Those are excellent commercial products for
 this category at scale. Acuse is the small, readable, self-hosted take: one container,

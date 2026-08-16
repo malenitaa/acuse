@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { BackStrip, Empty, Section, SectionTitle, Sheet, StatusPill } from '@/components/ui'
+import { unarchiveEventAction } from '@/app/actions'
+import { BackStrip, Empty, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { timeAgo, truncate } from '@/lib/format'
 import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
@@ -21,7 +22,9 @@ export default async function EventsPage({
     { value: 'pending', label: t.events.filterPending },
     { value: 'dead', label: t.events.filterDead },
     { value: 'delivered', label: t.events.filterDelivered },
+    { value: 'archived', label: t.events.filterArchived },
   ]
+  const showingArchive = status === 'archived'
 
   return (
     <Sheet>
@@ -88,6 +91,19 @@ export default async function EventsPage({
                   <td className="px-6 py-2.5 text-right text-faint">
                     {timeAgo(event.received_at, lang)}
                   </td>
+                  {showingArchive ? (
+                    <td className="px-6 py-2.5 text-right">
+                      <form action={unarchiveEventAction}>
+                        <input type="hidden" name="eventId" value={event.id} />
+                        <SubmitButton
+                          pendingLabel={dict[lang].actions.processing}
+                          doneLabel={t.events.restored}
+                        >
+                          {t.events.restore}
+                        </SubmitButton>
+                      </form>
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>

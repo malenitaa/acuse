@@ -41,13 +41,17 @@ create table events (
   delivered_at    timestamptz,
   last_error      text,
   -- Lease held by a worker mid-delivery, so two workers never double-send.
-  locked_at       timestamptz
+  locked_at       timestamptz,
+  -- Acuse never deletes: retention ARCHIVES old delivered events out of the
+  -- operational lists. Archived rows stay browsable and restorable forever.
+  archived_at     timestamptz
 );
 
 create unique index events_dedupe_idx
   on events (endpoint_id, dedupe_key) where dedupe_key is not null;
 create index events_queue_idx on events (status, next_attempt_at);
 create index events_recent_idx on events (endpoint_id, received_at desc);
+create index events_archived_idx on events (archived_at) where archived_at is not null;
 
 -- The audit trail. One row per HTTP request we made to the destination.
 create table attempts (
