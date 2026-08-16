@@ -232,3 +232,19 @@ export async function replayEvent(eventId: string): Promise<DeliveryResult | nul
   const job = { ...jobs[0], max_attempts: jobs[0].attempt_count + 2 }
   return deliverEvent(job, { manual: true })
 }
+
+/**
+ * Requeue every undelivered event at once: the morning-after-an-outage
+ * button. Each one gets exactly one more try from the normal queue; the
+ * ones that fail again return to undelivered, the ones whose destination
+ * recovered get delivered and counted as rescued.
+ */
+export async function replayAllDead(): Promise<number> {
+  const rows = await query<{ id: string }>(
+    `update events
+     set status = 'pending', next_attempt_at = now(), locked_at = null
+     where status = 'dead' and archived_at is null
+     returning id`,
+  )
+  return rows.length
+}

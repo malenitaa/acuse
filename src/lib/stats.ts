@@ -97,6 +97,39 @@ export async function listEvents(options: {
   )
 }
 
+/**
+ * How many events match a filter, regardless of the list cap. The lists show
+ * the latest N; this is the honest total behind them.
+ */
+export async function countEvents(options: {
+  endpointId?: string
+  status?: string
+}): Promise<number> {
+  const conditions: string[] = []
+  const params: unknown[] = []
+
+  if (options.endpointId) {
+    params.push(options.endpointId)
+    conditions.push(`endpoint_id = $${params.length}`)
+  }
+  if (options.status === 'archived') {
+    conditions.push('archived_at is not null')
+  } else {
+    conditions.push('archived_at is null')
+    if (options.status && options.status !== 'all') {
+      params.push(options.status)
+      conditions.push(`status = $${params.length}`)
+    }
+  }
+
+  const row = await queryOne<{ n: number }>(
+    `select count(*)::int as n from events
+     ${conditions.length ? `where ${conditions.join(' and ')}` : ''}`,
+    params,
+  )
+  return row?.n ?? 0
+}
+
 export async function getEvent(id: string): Promise<EventListItem | null> {
   return queryOne<EventListItem>(
     `select e.*, ep.name as endpoint_name

@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { unarchiveEventAction } from '@/app/actions'
+import { replayAllDeadAction, unarchiveEventAction } from '@/app/actions'
 import { BackStrip, Empty, Section, SectionTitle, Sheet, StatusPill, SubmitButton } from '@/components/ui'
 import { timeAgo, truncate } from '@/lib/format'
 import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
-import { listEvents } from '@/lib/stats'
+import { countEvents, listEvents } from '@/lib/stats'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +14,11 @@ export default async function EventsPage({
   searchParams: Promise<{ status?: string }>
 }) {
   const { status = 'all' } = await searchParams
-  const [lang, events] = await Promise.all([getLang(), listEvents({ status, limit: 200 })])
+  const [lang, events, total] = await Promise.all([
+    getLang(),
+    listEvents({ status, limit: 200 }),
+    countEvents({ status }),
+  ])
   const t = dict[lang]
 
   const filters = [
@@ -52,6 +56,17 @@ export default async function EventsPage({
         >
           {t.events.title}
         </SectionTitle>
+
+        {status === 'dead' && events.length > 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-soft px-6 py-3">
+            <p className="text-[12px] text-muted">{t.events.replayAllNote}</p>
+            <form action={replayAllDeadAction}>
+              <SubmitButton pendingLabel={t.actions.processing} doneLabel={t.actions.done}>
+                {t.events.replayAll(total)}
+              </SubmitButton>
+            </form>
+          </div>
+        ) : null}
 
         {events.length === 0 ? (
           <Empty>{t.events.empty}</Empty>

@@ -110,6 +110,8 @@ const es = {
     colAttempts: 'Intentos',
     colReceived: 'Recibido',
     empty: 'No hay eventos con ese estado.',
+    replayAll: (n: number) => (n === 1 ? 'Reenviar el evento' : `Reenviar los ${n}`),
+    replayAllNote: 'Todos vuelven a la cola y se van entregando ya mismo.',
   },
   event: {
     received: 'Recibido',
@@ -281,6 +283,8 @@ const en: typeof es = {
     colAttempts: 'Attempts',
     colReceived: 'Received',
     empty: 'No events with that status.',
+    replayAll: (n: number) => (n === 1 ? 'Redeliver the event' : `Redeliver all ${n}`),
+    replayAllNote: 'They all rejoin the queue and start delivering right away.',
   },
   event: {
     received: 'Received',

@@ -3,7 +3,7 @@
 import { refresh } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { query } from '@/lib/db'
-import { drainQueue, replayEvent } from '@/lib/delivery'
+import { drainQueue, replayAllDead, replayEvent } from '@/lib/delivery'
 import { checkDestination } from '@/lib/destination-guard'
 import { newId } from '@/lib/ids'
 import { newSigningSecret } from '@/lib/signature'
@@ -21,6 +21,17 @@ export async function processQueueAction() {
 export async function replayEventAction(formData: FormData) {
   const eventId = String(formData.get('eventId') ?? '')
   if (eventId) await replayEvent(eventId)
+  refresh()
+}
+
+/**
+ * Bulk redeliver after an outage. One delivery pass runs immediately so the
+ * operator sees movement; if the batch is bigger than one pass, the worker's
+ * next ticks finish the rest.
+ */
+export async function replayAllDeadAction() {
+  const requeued = await replayAllDead()
+  if (requeued > 0) await drainQueue()
   refresh()
 }
 
