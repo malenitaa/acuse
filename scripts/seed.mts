@@ -17,7 +17,7 @@ function newId(prefix: string, length = 18): string {
  */
 const ENDPOINTS = [
   {
-    name: 'Shopify → ERP',
+    name: 'Tienda online → ERP',
     sink: 'mode=ok',
     maxAttempts: 8,
     share: 0.6,

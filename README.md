@@ -15,6 +15,15 @@ were rescued** that would otherwise have been silently lost.
 English and Spanish; the whole thing runs on your own infrastructure with one
 `docker compose up`.
 
+![The Acuse console, «instrument» theme: events rescued, integration health, and the full delivery record](docs/img/console-instrument-dark.png)
+
+<details>
+<summary><strong>Same product, other personality: the «ledger» theme</strong></summary>
+
+![The Acuse console, «ledger» theme: a paper ledger on a desk — serif type, ruled sections, rubber-stamp statuses](docs/img/console-ledger-light.png)
+
+</details>
+
 ## The problem
 
 Companies wire their online store to an ERP, web forms to a CRM, billing to accounting.
@@ -49,7 +58,7 @@ complains days later.
   destinations can verify origin and reject replays using any Standard Webhooks
   library — Svix's SDKs included.
 - **Failure alerts as webhooks** — set `ALERT_WEBHOOK_URL` and every event that exhausts
-  its retries POSTs a JSON alert there. Point it at Slack, an n8n or Albato trigger, or
+  its retries POSTs a JSON alert there. Point it at a chat webhook, an automation-platform trigger, or
   even another Acuse: delivery failures become one more event your tools can route.
 - **Two themes × light/dark** — a full-width ops console («instrument») or a paper
   ledger («libro»), each in light and dark, following your system preference. Bilingual
@@ -75,7 +84,7 @@ in a Docker volume; `docker compose down` stops everything.
 - First boot builds the image (a few minutes); after that it starts in seconds.
 - Create integrations from the console (**+ new integration**): give it a name and the
   destination URL, and Acuse hands you the ingest URL to paste into the emitting system
-  (Albato, Shopify, Stripe, a form backend…) in place of the direct destination.
+  (your online store, your CRM, your automation platform, a form backend…) in place of the direct destination.
 - To expose it beyond your network, put a domain with HTTPS in front (Caddy, nginx);
   for internal use, the IP is enough.
 
@@ -100,7 +109,7 @@ the ticking.
 1. **Create an integration** (*+ new integration* on the dashboard): a name and the
    destination URL where events must be delivered.
 2. **Paste the ingest URL** Acuse gives you into the system that emits the webhooks
-   (Albato, Shopify, Stripe, a form backend…), in place of the direct destination.
+   (your online store, your CRM, your automation platform, a form backend…), in place of the direct destination.
 3. **Read the dashboard**: health per integration, every event with its full attempt
    trail, and one-click replay for anything that exhausted its retries.
 
@@ -112,7 +121,7 @@ Two patterns worth knowing:
   workflow's final step — an HTTP call to a second integration marking *done*. If "in"
   says 40 and "done" says 37, three runs died inside, and you know exactly which ones.
 - **Route failures to your tools.** With `ALERT_WEBHOOK_URL` set, exhausted events POST
-  a JSON alert wherever you point it — a Slack webhook, an n8n/Albato error workflow,
+  a JSON alert wherever you point it — a chat webhook, an automation error-workflow,
   or another Acuse.
 
 ## Security

@@ -119,7 +119,7 @@ const es = {
     title: '¿Cómo empiezo?',
     step1: 'Creá una integración: un nombre y la URL de destino adonde hay que entregar cada aviso.',
     step2:
-      'Acuse te da una URL de ingreso. Pegala en el sistema que emite los webhooks (Albato, Shopify, Stripe, un formulario…) en lugar del destino directo.',
+      'Acuse te da una URL de ingreso. Pegala en el sistema que emite los webhooks (tu tienda online, tu CRM, tu plataforma de automatización, un formulario…) en lugar del destino directo.',
     step3:
       'Listo: cada aviso que llegue se guarda antes de responder, se entrega con reintentos, y este panel te avisa si algo se cae — antes de que se pierda nada.',
     cta: 'Crear la primera integración',
@@ -129,9 +129,9 @@ const es = {
     title: 'Nueva integración',
     dashboardLink: '+ nueva integración',
     intro:
-      'Una integración es un caño con garantía: acuse recibe los webhooks de un sistema y se encarga de que lleguen al destino. Al crearla, acuse te da una URL de ingreso — esa es la que pegás en el sistema que emite los avisos (Albato, Shopify, Stripe, un formulario…) en lugar del destino directo.',
+      'Una integración es un caño con garantía: acuse recibe los webhooks de un sistema y se encarga de que lleguen al destino. Al crearla, acuse te da una URL de ingreso — esa es la que pegás en el sistema que emite los avisos (tu tienda online, tu CRM, tu plataforma de automatización, un formulario…) en lugar del destino directo.',
     nameLabel: 'Nombre',
-    namePlaceholder: 'Albato → CRM',
+    namePlaceholder: 'App → CRM',
     nameHelp: 'Cómo la vas a reconocer en el panel.',
     destinationLabel: 'URL de destino',
     destinationPlaceholder: 'https://tu-sistema.com/webhook',
@@ -277,7 +277,7 @@ const en: typeof es = {
     title: 'How do I start?',
     step1: 'Create an integration: a name and the destination URL where each event must be delivered.',
     step2:
-      'Acuse hands you an ingest URL. Paste it into the system that emits the webhooks (Albato, Shopify, Stripe, a form backend…) in place of the direct destination.',
+      'Acuse hands you an ingest URL. Paste it into the system that emits the webhooks (your online store, your CRM, your automation platform, a form backend…) in place of the direct destination.',
     step3:
       'Done: every incoming event is stored before answering, delivered with retries, and this dashboard warns you when something breaks — before anything is lost.',
     cta: 'Create the first integration',
@@ -287,9 +287,9 @@ const en: typeof es = {
     title: 'New integration',
     dashboardLink: '+ new integration',
     intro:
-      'An integration is a pipe with a guarantee: Acuse receives one system’s webhooks and makes sure they reach their destination. When you create it, Acuse gives you an ingest URL — that is what you paste into the emitting system (Albato, Shopify, Stripe, a form…) instead of the direct destination.',
+      'An integration is a pipe with a guarantee: Acuse receives one system’s webhooks and makes sure they reach their destination. When you create it, Acuse gives you an ingest URL — that is what you paste into the emitting system (your online store, your CRM, your automation platform, a form backend…) instead of the direct destination.',
     nameLabel: 'Name',
-    namePlaceholder: 'Albato → CRM',
+    namePlaceholder: 'App → CRM',
     nameHelp: 'How you will recognize it on the dashboard.',
     destinationLabel: 'Destination URL',
     destinationPlaceholder: 'https://your-system.com/webhook',

@@ -31,7 +31,7 @@ services:
       # Uncomment if untrusted people can create endpoints on this instance:
       # BLOCK_PRIVATE_DESTINATIONS: '1'
       # Where to POST a JSON alert when an event exhausts its retries
-      # (a Slack webhook, an n8n/Albato trigger, or another Acuse):
+      # (a chat webhook, an automation-platform trigger, or another Acuse):
       # ALERT_WEBHOOK_URL: https://hooks.example.com/acuse-alerts
       # Per-client branding: the header reads «Acuse · <name>»:
       # INSTANCE_NAME: Empresa X

@@ -21,7 +21,7 @@ Click **+ new integration** and fill in:
 - **Destination URL**: `http://localhost:3000/api/demo-sink?mode=ok`
 
 That destination is a demo receiver Acuse ships with, so you don't need any other
-service to try this. In real life you'd put your CRM/ERP/n8n/Albato endpoint here.
+service to try this. In real life you'd put your CRM, ERP or automation-platform endpoint here.
 
 After creating it, the integration page shows your **ingest URL** — something like
 `http://localhost:3000/api/i/ik_xxxxxxxx`. That's the URL you'd paste into whatever
@@ -101,6 +101,6 @@ The signing secret of each integration lives in the `endpoints` table
   with HTTPS in front if you expose it beyond your network. See the
   [README](../README.md#security).
 - **Failure alerts** — set `ALERT_WEBHOOK_URL` and exhausted events POST a JSON alert
-  to your Slack/n8n/Albato.
+  to your chat, your automation platform, or another Acuse.
 - **Per-client branding** — set `INSTANCE_NAME: "Client X"` and the header reads
   «Acuse · Client X».

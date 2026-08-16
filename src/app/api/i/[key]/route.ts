@@ -6,8 +6,8 @@ import { allowIngest } from '@/lib/rate-limit'
 const MAX_BODY_BYTES = 1_000_000
 
 /**
- * The ingest endpoint. This is the URL a customer pastes into Shopify, Stripe,
- * Typeform or an n8n node.
+ * The ingest endpoint. This is the URL a customer pastes into their store,
+ * their payment processor, their form tool or their automation platform.
  *
  * It answers as fast as it can after the event is on disk. It deliberately does
  * not attempt delivery: the sender should never wait on a third party's server,
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ke
   const { key } = await context.params
 
   // Rate limit before touching the database: an abusive sender should cost
-  // as little as possible. Serious webhook emitters (Stripe, Shopify) treat
+  // as little as possible. Serious webhook emitters treat
   // 429 + retry-after politely and try again.
   if (!allowIngest(key)) {
     return Response.json(

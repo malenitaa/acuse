@@ -1,7 +1,7 @@
 /**
- * Outbound failure alerts, n8n-error-workflow style: when an event exhausts
+ * Outbound failure alerts, error-workflow style: when an event exhausts
  * its retries and lands in the dead-letter state, POST a JSON alert to
- * ALERT_WEBHOOK_URL (if set). Point it at Slack, an n8n/Albato trigger, or
+ * ALERT_WEBHOOK_URL (if set). Point it at a chat webhook, an automation-platform trigger, or
  * even another Acuse integration — a delivery failure becomes just another
  * webhook your tools can route.
  *
