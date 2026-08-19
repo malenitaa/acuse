@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/img/mark.png" alt="The Acuse mark: a check landing on a ledger line" width="88" height="88">
+
 # Acuse
 
 **When an integration breaks, the webhooks it missed are not gone. They arrive when it comes back.**
