@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!--
+    The mark is the product in one glyph: a receipt stamped as received.
+    A dark plate, a green check landing on it, and the ruled line of the
+    ledger underneath. Nothing thinner than 2.5px, so it survives 16x16.
+  -->
+  <rect width="32" height="32" rx="7" fill="#0a0c10"/>
+  <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="6.25" fill="none" stroke="#313947" stroke-width="1.5"/>
+  <path d="M8.5 16.5 L13.5 21.5 L23.5 10.5" fill="none" stroke="#3fb950" stroke-width="3.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M9 25.5 H23" stroke="#313947" stroke-width="2" stroke-linecap="round"/>
+</svg>

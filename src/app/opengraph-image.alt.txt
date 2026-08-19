@@ -1,0 +1,1 @@
+Acuse: when an integration breaks, the webhooks it missed are not gone. They arrive when it comes back.
