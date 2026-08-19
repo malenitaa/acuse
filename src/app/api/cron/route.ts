@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const a = Buffer.from(given)
     const b = Buffer.from(expected)
     if (a.length !== b.length || !timingSafeEqual(a, b)) {
-      return Response.json({ error: 'no autorizado' }, { status: 401 })
+      return Response.json({ error: 'unauthorized' }, { status: 401 })
     }
   }
 

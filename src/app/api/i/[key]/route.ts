@@ -21,19 +21,19 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ke
   // 429 + retry-after politely and try again.
   if (!allowIngest(key)) {
     return Response.json(
-      { error: 'demasiadas solicitudes' },
+      { error: 'too many requests' },
       { status: 429, headers: { 'retry-after': '60' } },
     )
   }
 
   const endpoint = await findEndpointByKey(key)
   if (!endpoint) {
-    return Response.json({ error: 'endpoint desconocido' }, { status: 404 })
+    return Response.json({ error: 'unknown endpoint' }, { status: 404 })
   }
 
   const raw = await request.text()
   if (raw.length > MAX_BODY_BYTES) {
-    return Response.json({ error: 'cuerpo demasiado grande' }, { status: 413 })
+    return Response.json({ error: 'body too large' }, { status: 413 })
   }
 
   let payload: unknown

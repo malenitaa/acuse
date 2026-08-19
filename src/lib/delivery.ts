@@ -86,7 +86,7 @@ async function sendOnce(job: DeliveryJob, attemptNumber: number) {
     error =
       cause instanceof Error
         ? cause.name === 'TimeoutError'
-          ? `sin respuesta en ${DELIVERY_TIMEOUT_MS / 1000}s`
+          ? `no response in ${DELIVERY_TIMEOUT_MS / 1000}s`
           : `${cause.name}: ${cause.message}`
         : String(cause)
   }

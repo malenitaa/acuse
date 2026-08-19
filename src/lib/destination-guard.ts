@@ -33,15 +33,15 @@ export function checkDestination(rawUrl: string): { ok: true } | { ok: false; re
   try {
     url = new URL(rawUrl)
   } catch {
-    return { ok: false, reason: 'destino inválido: no es una URL' }
+    return { ok: false, reason: 'invalid destination: not a URL' }
   }
 
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    return { ok: false, reason: `destino inválido: esquema ${url.protocol} no permitido` }
+    return { ok: false, reason: `invalid destination: scheme ${url.protocol} not allowed` }
   }
 
   if (process.env.BLOCK_PRIVATE_DESTINATIONS === '1' && isPrivateHost(url.hostname)) {
-    return { ok: false, reason: 'destino bloqueado: dirección privada (BLOCK_PRIVATE_DESTINATIONS)' }
+    return { ok: false, reason: 'destination blocked: private address (BLOCK_PRIVATE_DESTINATIONS)' }
   }
 
   return { ok: true }
