@@ -3,6 +3,26 @@
 From zero to a rescued webhook in five minutes. Everything happens on your machine; the
 only requirement is [Docker](https://www.docker.com/products/docker-desktop/).
 
+## 0. Look at what you are about to run
+
+You are about to run someone else's software on your machine, so here is the short
+list of files that tell you what it does. All of them are readable without knowing
+how to program, and they are the whole story:
+
+- [`docker-compose.yml`](../docker-compose.yml): the two containers that start, the
+  port they use and every setting you can turn on. Nothing else runs.
+- [`Dockerfile`](../Dockerfile): how the app image is built, and the fact that it
+  runs as an unprivileged user.
+- [`db/schema.sql`](../db/schema.sql): the three tables, with a plain-English comment
+  above each one saying what goes in it.
+- [`SECURITY.md`](../SECURITY.md): what Acuse stores, what it refuses to store, and
+  what it sends out.
+
+Two things that should never happen, on this or on anything else: Acuse never asks
+for your password, and it never asks you to turn off a protection your computer or
+your browser puts up. If a copy of this asks you for either, something is wrong with
+that copy. Do not turn the protection off.
+
 ## 1. Run it
 
 ```bash
@@ -98,8 +118,8 @@ Each integration's signing secret is on its page in the console, under
 ## Where to go next
 
 - **Production notes**: set `CONSOLE_PASSWORD` (locks the console), and put a domain
-  with HTTPS in front if you expose it beyond your network. See the
-  [README](../README.md#security).
+  with HTTPS in front if you expose it beyond your network. What to lock down, and
+  what stays open on purpose, is in [SECURITY.md](../SECURITY.md).
 - **Failure alerts**: set `ALERT_WEBHOOK_URL` and exhausted events POST a JSON alert
   to your chat, your automation platform, or another Acuse.
 - **Per-client branding**: set `INSTANCE_NAME: "Client X"` and the header reads
