@@ -14,24 +14,26 @@ const DRIVE_SECONDS = arg('seconds', 90)
 // Rough share of traffic per integration, in seed order.
 const SHARES = [0.6, 0.3, 0.1]
 
-const FIRST_NAMES = ['Malena', 'Joaquín', 'Camila', 'Tomás', 'Sofía', 'Lucas', 'Valentina']
-const LAST_NAMES = ['Villa', 'Fernández', 'Gómez', 'Suárez', 'Ríos', 'Paredes']
-const PRODUCTS = ['Teclado 60%', 'Monitor 27"', 'Notebook 14"', 'Silla ergonómica', 'Webcam 4K']
+// Invented sample data: the payloads that show up in the console during a
+// demo are made up on the spot, never anyone's real customers.
+const FIRST_NAMES = ['Ada', 'Bruno', 'Camila', 'Dilan', 'Elif', 'Farid', 'Greta']
+const LAST_NAMES = ['Aliaga', 'Beckett', 'Cordero', 'Duarte', 'Esposito', 'Falcone']
+const PRODUCTS = ['60% keyboard', '27" monitor', '14" laptop', 'Ergonomic chair', '4K webcam']
 
 const pick = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)]
 const money = (min: number, max: number) => Number((Math.random() * (max - min) + min).toFixed(2))
 
 function payloadFor(index: number) {
   const person = `${pick(FIRST_NAMES)} ${pick(LAST_NAMES)}`
-  const email = `${person.split(' ')[0].toLowerCase()}@ejemplo.com.ar`
+  const email = `${person.split(' ')[0].toLowerCase()}@example.com`
 
   if (index === 0) {
     return {
       topic: 'orders/create',
       order: {
         id: 4800000 + Math.floor(Math.random() * 99999),
-        total: money(15000, 320000),
-        currency: 'ARS',
+        total: money(150, 3200),
+        currency: 'USD',
         customer: { name: person, email },
         line_items: [{ title: pick(PRODUCTS), quantity: 1 + Math.floor(Math.random() * 3) }],
       },
@@ -40,13 +42,13 @@ function payloadFor(index: number) {
 
   if (index === 1) {
     return {
-      form: 'contacto-comercial',
+      form: 'contact-sales',
       submitted_at: new Date().toISOString(),
       fields: {
-        nombre: person,
+        name: person,
         email,
-        empresa: `${pick(LAST_NAMES)} SRL`,
-        mensaje: 'Quiero una demo para el equipo de operaciones.',
+        company: `${pick(LAST_NAMES)} Ltd`,
+        message: 'We would like a demo for the operations team.',
       },
     }
   }
@@ -55,8 +57,8 @@ function payloadFor(index: number) {
     event: 'invoice.issued',
     invoice: {
       number: `A-0001-${String(10000 + Math.floor(Math.random() * 89999))}`,
-      cuit: '30-71234567-8',
-      net: money(50000, 900000),
+      tax_id: '00-00000000-0',
+      net: money(500, 9000),
       vat_rate: 0.21,
     },
   }
@@ -80,11 +82,11 @@ const { rows: endpoints } = await client.query<{ ingest_key: string; name: strin
 await client.end()
 
 if (endpoints.length === 0) {
-  console.error('No hay integraciones. Corré primero: npm run seed')
+  console.error('No integrations yet. Run this first: npm run seed')
   process.exit(1)
 }
 
-console.log(`Enviando ${TOTAL_EVENTS} eventos a ${APP_URL} ...`)
+console.log(`Sending ${TOTAL_EVENTS} events to ${APP_URL} ...`)
 
 const sent = new Array(endpoints.length).fill(0)
 
@@ -96,7 +98,7 @@ for (let i = 0; i < TOTAL_EVENTS; i++) {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      'user-agent': 'Simulador/1.0',
+      'user-agent': 'AcuseSimulator/1.0',
       'x-request-id': `sim-${Date.now()}-${i}`,
     },
     body: JSON.stringify(payloadFor(index)),
@@ -117,7 +119,7 @@ for (const [index, endpoint] of endpoints.entries()) {
   console.log(`  ${sent[index]} → ${endpoint.name}`)
 }
 
-console.log(`\nProcesando la cola durante ${DRIVE_SECONDS}s (así los reintentos se resuelven)...`)
+console.log(`\nDraining the queue for ${DRIVE_SECONDS}s, so the retries resolve...`)
 
 const deadline = Date.now() + DRIVE_SECONDS * 1000
 
@@ -135,12 +137,12 @@ while (Date.now() < deadline) {
   if (summary.claimed > 0) {
     const remaining = Math.round((deadline - Date.now()) / 1000)
     console.log(
-      `  [${remaining}s] tomados ${summary.claimed} · entregados ${summary.delivered} · ` +
-        `fallaron ${summary.failed}${summary.dead ? ` · agotados ${summary.dead}` : ''}`,
+      `  [${remaining}s] claimed ${summary.claimed} · delivered ${summary.delivered} · ` +
+        `failed ${summary.failed}${summary.dead ? ` · exhausted ${summary.dead}` : ''}`,
     )
   }
 
   await new Promise((resolve) => setTimeout(resolve, 3000))
 }
 
-console.log(`\nListo. Abrí ${APP_URL} para ver el resultado.`)
+console.log(`\nDone. Open ${APP_URL} to see the result.`)

@@ -17,13 +17,13 @@ function newId(prefix: string, length = 18): string {
  */
 const ENDPOINTS = [
   {
-    name: 'Tienda online → ERP',
+    name: 'Online store → ERP',
     sink: 'mode=ok',
     maxAttempts: 8,
     share: 0.6,
   },
   {
-    name: 'Formularios web → CRM',
+    name: 'Web forms → CRM',
     // Refuses the first attempt, accepts the second. This is the endpoint that
     // produces the rescued number on the dashboard.
     sink: 'mode=recover&after=2',
@@ -31,9 +31,9 @@ const ENDPOINTS = [
     share: 0.3,
   },
   {
-    name: 'Facturación → Contabilidad',
+    name: 'Billing → Accounting',
     sink: 'mode=down',
-    // Short budget so the demo reaches "sin entregar" in about a minute
+    // Short budget so the demo reaches "undelivered" in about a minute
     // instead of an hour.
     maxAttempts: 4,
     share: 0.1,
@@ -63,4 +63,4 @@ for (const endpoint of ENDPOINTS) {
 }
 
 await client.end()
-console.log(`\n${ENDPOINTS.length} integraciones creadas. Ahora: npm run simulate`)
+console.log(`\n${ENDPOINTS.length} integrations created. Now: npm run simulate`)

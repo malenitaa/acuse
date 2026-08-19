@@ -10,4 +10,4 @@ await client.connect()
 await client.query(schema)
 await client.end()
 
-console.log('Base recreada desde db/schema.sql')
+console.log('Database recreated from db/schema.sql')
