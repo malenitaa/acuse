@@ -28,6 +28,12 @@ opens is `db/schema.sql`, read once by `npm run db:reset`. Everything Acuse
 knows lives in those three tables, so backing them up backs up the product, and
 dropping the database drops everything.
 
+Nothing on that list lives outside Docker and the folder you cloned. There is no
+installer, no background agent, no login item, no preferences file and no system
+setting, which is why uninstalling is two commands and why you can verify the
+result yourself:
+[removing it, leaving nothing behind](docs/QUICKSTART.md#removing-it-leaving-nothing-behind).
+
 ## What it stores from an incoming webhook
 
 Three things, and no more:

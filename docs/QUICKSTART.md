@@ -115,6 +115,54 @@ function verify(secret, headers, rawBody, toleranceSeconds = 300) {
 Each integration's signing secret is on its page in the console, under
 **Signing secret**: masked by default, with **Reveal** and **Copy** buttons.
 
+## Removing it, leaving nothing behind
+
+Acuse installs nothing. It has no installer, no background agent, no login item, no
+preferences file and no settings anywhere in your system. Everything it is lives in
+two places: the folder you cloned, and Docker. Removing those two removes all of it.
+
+**First, if you want to keep the events**, take them with you before deleting the
+volume, because that step is permanent:
+
+```bash
+docker compose exec db pg_dump -U acuse acuse > acuse-backup.sql
+```
+
+**Then, from inside the folder you cloned:**
+
+```bash
+docker compose down -v --rmi local
+```
+
+That one command stops both containers and deletes them, deletes the database volume
+with everything Acuse ever stored, deletes the private network it created, and
+deletes the image that was built on your machine. Then delete the folder itself:
+
+```bash
+cd ..
+rm -rf acuse
+```
+
+**Optional, and only if nothing else on your machine uses it**, the Postgres base
+image that was downloaded:
+
+```bash
+docker image rm postgres:16-alpine
+```
+
+**Check for yourself that nothing survived.** These three commands should print
+nothing at all:
+
+```bash
+docker ps -a --filter name=acuse
+docker volume ls | grep acuse
+docker image ls | grep acuse
+```
+
+If you ran it in development mode instead of Docker, there are two extra leftovers,
+both inside the folder you are about to delete (`node_modules` and `.next`), plus the
+database you created by hand, which you remove with `dropdb acuse`.
+
 ## Where to go next
 
 - **Production notes**: set `CONSOLE_PASSWORD` (locks the console), and put a domain

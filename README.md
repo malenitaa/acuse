@@ -144,6 +144,12 @@ The console is at `http://localhost:3000`, or at your server's address. Data
 survives restarts; `docker compose down` stops everything. The first boot builds
 the image and takes a few minutes, after that it starts in seconds.
 
+Acuse installs nothing on your machine: no agent, no login item, no preferences
+file, no system settings. It is a folder and two containers, so removing it is
+deleting those, and there is a
+[step by step for that](docs/QUICKSTART.md#removing-it-leaving-nothing-behind),
+including how to check for yourself that nothing survived.
+
 **→ Five-minute guided tour, with a rescue you can watch happen:
 [docs/QUICKSTART.md](docs/QUICKSTART.md)**
 
