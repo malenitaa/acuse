@@ -25,7 +25,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
 
   return (
     <Sheet>
-      <BackStrip href="/">{t.events.back}</BackStrip>
+      <BackStrip href="/app">{t.events.back}</BackStrip>
 
       <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -34,7 +34,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             <div className="mt-2 flex items-center gap-3">
               <StatusPill status={event.status} attempts={event.attempt_count} lang={lang} />
               <Link
-                href={`/endpoints/${event.endpoint_id}`}
+                href={`/app/endpoints/${event.endpoint_id}`}
                 className="text-[13px] text-muted hover:text-accent"
               >
                 {event.endpoint_name}

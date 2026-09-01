@@ -31,7 +31,9 @@ cd acuse
 docker compose up -d
 ```
 
-Open **http://localhost:3000**. You'll see the empty console with the three steps.
+Open **http://localhost:3000** for the landing page, then
+**http://localhost:3000/app** for the console. You'll see the empty console with
+the three steps (or click **Take the tour** in the sidebar for a guided walkthrough).
 
 ## 2. Create an integration
 

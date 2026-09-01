@@ -39,7 +39,7 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
 
   return (
     <Sheet>
-      <BackStrip href="/">{t.events.back}</BackStrip>
+      <BackStrip href="/app">{t.events.back}</BackStrip>
 
       <Section className="px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -132,7 +132,7 @@ export default async function EndpointPage({ params }: { params: Promise<{ id: s
                 >
                   <td className="px-6 py-2.5">
                     <Link
-                      href={`/events/${event.id}`}
+                      href={`/app/events/${event.id}`}
                       className="font-mono text-[12px] text-faint hover:text-accent"
                     >
                       {truncate(event.id, 16)}

@@ -11,7 +11,7 @@ export default async function NewEndpointPage() {
 
   return (
     <Sheet>
-      <BackStrip href="/">{t.events.back}</BackStrip>
+      <BackStrip href="/app">{t.events.back}</BackStrip>
 
       <Section className="px-6 py-6">
         <h1 className="font-serif text-xl font-semibold tracking-tight">{t.newEndpoint.title}</h1>

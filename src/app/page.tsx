@@ -1,329 +1,236 @@
 import Link from 'next/link'
-import { processQueueAction } from './actions'
-import { AutoRefresh } from '@/components/auto-refresh'
-import { PanelSections } from '@/components/panel-sections'
-import {
-  Empty,
-  HealthBadge,
-  Section,
-  SectionTitle,
-  Sheet,
-  StatusPill,
-  SubmitButton,
-  Totals,
-} from '@/components/ui'
-import { formatNumber, formatPercent, timeAgo, truncate } from '@/lib/format'
-import { dict, type Lang } from '@/lib/i18n'
+import { LangToggle } from '@/components/lang-toggle'
+import { SchemeToggle } from '@/components/scheme-toggle'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { dict } from '@/lib/i18n'
 import { getLang } from '@/lib/lang'
-import { getEndpointHealth, getNextRetryAt, getStats, listEvents } from '@/lib/stats'
-import type { Stats } from '@/lib/types'
 
-export const dynamic = 'force-dynamic'
+const GITHUB = 'https://github.com/malenitaa/acuse'
 
-export default async function DashboardPage() {
-  const [lang, stats, endpoints, events, nextRetryAt] = await Promise.all([
-    getLang(),
-    getStats(),
-    getEndpointHealth(),
-    listEvents({ limit: 12 }),
-    getNextRetryAt(),
-  ])
-  const t = dict[lang]
+/**
+ * The marketing landing, at «/». It shares the console's tokens and its
+ * three-theme switch, so the page a visitor lands on already looks like the
+ * product they are about to open. Every «open the console» path leads to
+ * «/app»; the «learn» path leads to «/app?tour=1», which starts the guided
+ * tour on arrival.
+ */
+export default async function LandingPage() {
+  const lang = await getLang()
+  const t = dict[lang].landing
 
-  const broken = endpoints.filter((endpoint) => endpoint.health === 'down')
-
-  const numberSection = (
-    <div className="divide-y divide-line">
-      <Headline stats={stats} lang={lang} />
-      {broken.length > 0 ? <MarginNote names={broken.map((e) => e.name)} lang={lang} /> : null}
-    </div>
-  )
-
-  const totalsSection = (
-    <Totals
-        lang={lang}
-        items={[
-          { label: t.dashboard.received, value: stats.received },
-          {
-            label: t.dashboard.delivered,
-            value: stats.delivered,
-            hint: t.dashboard.ofTotal(formatPercent(stats.delivered, stats.received)),
-            tone: 'good',
-          },
-          {
-            label: t.dashboard.retrying,
-            value: stats.retrying,
-            hint: nextRetryAt
-              ? t.dashboard.nextRetry(timeAgo(nextRetryAt, lang))
-              : t.dashboard.queueEmpty,
-            tone: stats.retrying > 0 ? 'warn' : 'neutral',
-          },
-          {
-            label: t.dashboard.dead,
-            value: stats.dead,
-            hint: stats.dead > 0 ? t.dashboard.needHuman : t.dashboard.none,
-            tone: stats.dead > 0 ? 'bad' : 'neutral',
-          },
-        ]}
-      />
-  )
-
-  const integrationsSection = (
-      <Section>
-        <SectionTitle
-          aside={
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <Link
-                href="/endpoints/new"
-                className="text-[12px] text-accent transition-colors hover:text-text"
-              >
-                {t.newEndpoint.dashboardLink}
-              </Link>
-              <form action={processQueueAction}>
-                <SubmitButton
-                  variant="primary"
-                  pendingLabel={t.actions.processing}
-                  doneLabel={t.actions.recorded}
-                >
-                  {t.actions.processQueue}
-                </SubmitButton>
-              </form>
+  return (
+    <div className="lp">
+      <header className="lp-nav">
+        <div className="lp-nav-inner">
+          <Link href="/" className="lp-brand">
+            <img src="/mark.png" alt="" width={26} height={26} className="lp-brand-mark" />
+            Acuse
+          </Link>
+          <nav className="lp-nav-links" aria-label={lang === 'es' ? 'Secciones' : 'Sections'}>
+            <a href="#how">{t.nav.how}</a>
+            <a href="#features">{t.nav.features}</a>
+            <a href="#run">{t.nav.run}</a>
+            <Link href="/guia">{dict[lang].guide.link}</Link>
+          </nav>
+          <div className="lp-nav-right">
+            <div className="lp-toggles">
+              <ThemeToggle labels={dict[lang].shell.themeNames} />
+              <SchemeToggle />
+              <LangToggle current={lang} />
             </div>
-          }
-        >
-          {t.dashboard.integrations}
-        </SectionTitle>
-        {endpoints.length === 0 ? (
-          <Onboarding lang={lang} />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
-              <thead className="text-[11px] uppercase tracking-[0.08em] text-faint">
-                <tr className="border-b border-line-soft">
-                  <th className="px-6 py-2 text-left font-medium">{t.dashboard.colName}</th>
-                  <th className="px-6 py-2 text-left font-medium">{t.dashboard.colStatus}</th>
-                  <th className="px-6 py-2 text-right font-medium">{t.dashboard.colReceived}</th>
-                  <th className="px-6 py-2 text-right font-medium">{t.dashboard.colRescued}</th>
-                  <th className="px-6 py-2 text-right font-medium">{t.dashboard.colDead}</th>
-                  <th className="px-6 py-2 text-right font-medium">
-                    {t.dashboard.colLastDelivery}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {endpoints.map((endpoint) => (
-                  <tr
-                    key={endpoint.id}
-                    className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
-                  >
-                    <td className="px-6 py-2.5">
-                      <Link href={`/endpoints/${endpoint.id}`} className="hover:text-accent">
-                        {endpoint.name}
-                      </Link>
-                      {endpoint.paused ? (
-                        <span className="ml-2 text-[11px] italic text-faint">
-                          {t.dashboard.paused}
-                        </span>
-                      ) : null}
-                    </td>
-                    <td className="px-6 py-2.5">
-                      <HealthBadge health={endpoint.health} lang={lang} />
-                    </td>
-                    <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-muted">
-                      {formatNumber(endpoint.total, lang)}
-                    </td>
-                    <td className="tnum px-6 py-2.5 text-right font-mono text-[12px] text-good">
-                      {endpoint.recovered > 0 ? formatNumber(endpoint.recovered, lang) : '—'}
-                    </td>
-                    <td className="tnum px-6 py-2.5 text-right font-mono text-[12px]">
-                      <span className={endpoint.dead > 0 ? 'text-bad' : 'text-faint'}>
-                        {endpoint.dead > 0 ? formatNumber(endpoint.dead, lang) : '—'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-2.5 text-right text-faint">
-                      {timeAgo(endpoint.last_delivered_at, lang)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Section>
-  )
-
-  const latestSection = (
-      <Section>
-        <SectionTitle
-          aside={
-            <Link href="/events" className="text-[12px] text-faint transition-colors hover:text-muted">
-              {t.dashboard.viewAll}
+            <a href={GITHUB} className="lp-ghost" target="_blank" rel="noreferrer">
+              {t.nav.github}
+            </a>
+            <Link href="/app" className="lp-cta">
+              {t.nav.console}
             </Link>
-          }
-        >
-          {t.dashboard.latestEvents}
-        </SectionTitle>
-        {events.length === 0 ? (
-          <Empty>
-            {t.dashboard.emptyEvents} <code className="font-mono">npm run simulate</code>.
-          </Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
-              <tbody>
-                {events.map((event) => (
-                  <tr
-                    key={event.id}
-                    className="border-b border-line-soft last:border-0 transition-colors hover:bg-panel-2/60"
-                  >
-                    <td className="px-6 py-2.5">
-                      <Link
-                        href={`/events/${event.id}`}
-                        className="font-mono text-[12px] text-faint hover:text-accent"
-                      >
-                        {truncate(event.id, 14)}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-2.5 text-muted">{event.endpoint_name}</td>
-                    <td className="px-6 py-2.5">
-                      <StatusPill status={event.status} attempts={event.attempt_count} lang={lang} />
-                    </td>
-                    <td className="tnum px-6 py-2.5 text-right text-faint">
-                      {t.dashboard.attempts(event.attempt_count)}
-                    </td>
-                    <td className="px-6 py-2.5 text-right text-faint">
-                      {timeAgo(event.received_at, lang)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
-        )}
-      </Section>
-  )
+        </div>
+      </header>
 
-  return (
-    <Sheet>
-      <AutoRefresh />
-      <PanelSections
-        customizeLabel={t.dashboard.customize}
-        labels={{
-          number: t.dashboard.sectionNumber,
-          totals: t.dashboard.sectionTotals,
-          integrations: t.dashboard.integrations,
-          latest: t.dashboard.latestEvents,
-        }}
-        sections={{
-          number: numberSection,
-          totals: totalsSection,
-          integrations: integrationsSection,
-          latest: latestSection,
-        }}
-      />
-    </Sheet>
-  )
-}
+      <main>
+        {/* Hero */}
+        <section className="lp-hero">
+          <p className="lp-eyebrow">{t.hero.eyebrow}</p>
+          <h1 className="lp-hero-title">{t.hero.title}</h1>
+          <p className="lp-hero-sub">{t.hero.subtitle}</p>
+          <div className="lp-hero-actions">
+            <Link href="/app" className="lp-cta lp-cta-lg">
+              {t.hero.ctaPrimary} <span aria-hidden="true">→</span>
+            </Link>
+            <a href={GITHUB} className="lp-ghost lp-ghost-lg" target="_blank" rel="noreferrer">
+              {t.hero.ctaSecondary}
+            </a>
+          </div>
+          <p className="lp-hero-note">{t.hero.note}</p>
+          <ul className="lp-trust">
+            {t.trust.map((item) => (
+              <li key={item}>
+                <span className="lp-check" aria-hidden="true">
+                  ✓
+                </span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-/**
- * The one number the whole product exists to produce. Everything else on the
- * sheet is evidence that this number is real.
- */
-function Headline({ stats, lang }: { stats: Stats; lang: Lang }) {
-  const t = dict[lang]
-  return (
-    <Section className="px-6 py-7">
-      <p className="font-serif text-[15px] italic text-muted">{t.dashboard.headline}</p>
-      <div className="tnum mt-1 font-serif text-6xl font-semibold text-good">
-        {formatNumber(stats.recovered, lang)}
-      </div>
-      <p className="mt-3 max-w-xl text-[13px] leading-relaxed text-muted">
-        {t.dashboard.headlineDesc(formatNumber(stats.recovered, lang))}
-      </p>
-      {stats.received > 0 ? <CompositionBar stats={stats} lang={lang} /> : null}
-    </Section>
-  )
-}
+        {/* Console screenshot */}
+        <section className="lp-shot-wrap">
+          <div className="lp-shot">
+            <img
+              src="/console-instrument-dark.png"
+              alt={t.showcase.caption}
+              width={2400}
+              height={1500}
+              className="lp-shot-img"
+            />
+          </div>
+        </section>
 
-/**
- * Every event received, split by how it ended. The rescued number needs a
- * denominator to mean anything, and the events still unlanded belong in the
- * same picture, or the bar flatters the product.
- */
-function CompositionBar({ stats, lang }: { stats: Stats; lang: Lang }) {
-  const t = dict[lang]
-  const segments = [
-    { key: 'firstTry', value: stats.firstTry, label: t.dashboard.barFirstTry, bar: 'bg-good/35' },
-    { key: 'recovered', value: stats.recovered, label: t.dashboard.barRescued, bar: 'bg-good' },
-    { key: 'pending', value: stats.pending, label: t.dashboard.barRetrying, bar: 'bg-warn' },
-    { key: 'dead', value: stats.dead, label: t.dashboard.barDead, bar: 'bg-bad' },
-  ].filter((segment) => segment.value > 0)
+        {/* Problem */}
+        <section className="lp-band">
+          <div className="lp-narrow">
+            <p className="lp-eyebrow lp-eyebrow-bad">{t.problem.eyebrow}</p>
+            <h2 className="lp-h2">{t.problem.title}</h2>
+            <p className="lp-lead">{t.problem.body}</p>
+            <p className="lp-lead">{t.problem.body2}</p>
+          </div>
+        </section>
 
-  return (
-    <div className="mt-5 max-w-xl">
-      <div className="draw-in flex h-2 border border-line-soft bg-panel-2">
-        {segments.map((segment) => (
-          <div
-            key={segment.key}
-            className={segment.bar}
-            style={{ width: `${(segment.value / stats.received) * 100}%` }}
-          />
-        ))}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-faint">
-        {segments.map((segment) => (
-          <span key={segment.key}>
-            <span className={`mr-1.5 inline-block size-2 align-middle ${segment.bar}`} />
-            {segment.label} · {formatPercent(segment.value, stats.received)}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
+        {/* How it works */}
+        <section id="how" className="lp-section">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">{t.how.eyebrow}</p>
+            <h2 className="lp-h2">{t.how.title}</h2>
+          </div>
+          <ol className="lp-steps">
+            {t.how.steps.map((s, i) => (
+              <li key={s.title} className="lp-step">
+                <span className="lp-step-num">{i + 1}</span>
+                <h3 className="lp-step-title">{s.title}</h3>
+                <p className="lp-step-body">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-/**
- * What a fresh install shows instead of an empty table: the three steps of
- * the whole product, in the operator's language, with the door to step one.
- * The npm hint stays as a smaller aside for people evaluating the demo.
- */
-function Onboarding({ lang }: { lang: Lang }) {
-  const t = dict[lang].onboarding
-  return (
-    <div className="px-6 py-8">
-      <h3 className="font-serif text-[16px] font-semibold">{t.title}</h3>
-      <ol className="mt-4 max-w-xl list-decimal space-y-3 pl-5 text-[13px] leading-relaxed text-muted">
-        <li>{t.step1}</li>
-        <li>{t.step2}</li>
-        <li>{t.step3}</li>
-      </ol>
-      <Link
-        href="/endpoints/new"
-        className="mt-5 inline-block border border-text px-3 py-1.5 text-[12px] font-semibold transition-colors hover:bg-text hover:text-panel"
-      >
-        {t.cta}
-      </Link>
-      <p className="mt-5 text-[11px] italic text-faint">
-        {t.demoHint} <code className="font-mono not-italic">npm run seed && npm run simulate</code>
-      </p>
-    </div>
-  )
-}
+        {/* Features */}
+        <section id="features" className="lp-section">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">{t.features.eyebrow}</p>
+            <h2 className="lp-h2">{t.features.title}</h2>
+          </div>
+          <div className="lp-grid">
+            {t.features.items.map((f) => (
+              <div key={f.title} className="lp-card">
+                <h3 className="lp-card-title">{f.title}</h3>
+                <p className="lp-card-body">{f.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-/** A broken integration is an annotation on the record, not an app banner. */
-function MarginNote({ names, lang }: { names: string[]; lang: Lang }) {
-  const t = dict[lang]
-  return (
-    <div className="note-enter px-6 py-3">
-      <p className="text-[13px] leading-relaxed">
-        <span className="font-semibold text-bad">
-          ☞{' '}
-          {names.length === 1
-            ? t.dashboard.noteOne(names[0])
-            : t.dashboard.noteMany(names.length, names.join(', '))}
-        </span>{' '}
-        <span className="italic text-muted">{t.dashboard.noteTail}</span>
-      </p>
+        {/* Showcase / themes */}
+        <section className="lp-band">
+          <div className="lp-showcase">
+            <div className="lp-showcase-copy">
+              <p className="lp-eyebrow">{t.showcase.eyebrow}</p>
+              <h2 className="lp-h2">{t.showcase.title}</h2>
+              <p className="lp-lead">{t.showcase.body}</p>
+            </div>
+            <div className="lp-showcase-shots">
+              <img
+                src="/console-plano-dark.png"
+                alt=""
+                width={1600}
+                height={1000}
+                className="lp-mini-shot"
+              />
+              <img
+                src="/console-ledger-light.png"
+                alt=""
+                width={1600}
+                height={1000}
+                className="lp-mini-shot"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Learn / tour */}
+        <section className="lp-section">
+          <div className="lp-learn">
+            <p className="lp-eyebrow">{t.learn.eyebrow}</p>
+            <h2 className="lp-h2">{t.learn.title}</h2>
+            <p className="lp-lead">{t.learn.body}</p>
+            <div className="lp-hero-actions">
+              <Link href="/app?tour=1" className="lp-cta lp-cta-lg">
+                {t.learn.cta} <span aria-hidden="true">◎</span>
+              </Link>
+              <Link href="/guia" className="lp-ghost lp-ghost-lg">
+                {t.learn.guideCta}
+              </Link>
+            </div>
+            <p className="lp-learn-hint">{t.learn.hint}</p>
+          </div>
+        </section>
+
+        {/* Run it */}
+        <section id="run" className="lp-band">
+          <div className="lp-run">
+            <div className="lp-run-copy">
+              <p className="lp-eyebrow">{t.run.eyebrow}</p>
+              <h2 className="lp-h2">{t.run.title}</h2>
+              <p className="lp-lead">{t.run.body}</p>
+              <p className="lp-run-after">
+                {t.run.after} <code>http://localhost:3000/app</code>
+              </p>
+            </div>
+            <pre className="lp-code">
+              <code>{t.run.command}</code>
+            </pre>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="lp-section">
+          <div className="lp-section-head">
+            <p className="lp-eyebrow">{t.faq.eyebrow}</p>
+            <h2 className="lp-h2">{t.faq.title}</h2>
+          </div>
+          <div className="lp-faq">
+            {t.faq.items.map((item) => (
+              <div key={item.q} className="lp-faq-item">
+                <h3 className="lp-faq-q">{item.q}</h3>
+                <p className="lp-faq-a">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <footer className="lp-footer">
+        <div className="lp-footer-inner">
+          <div>
+            <Link href="/" className="lp-brand">
+              <img src="/mark.png" alt="" width={22} height={22} className="lp-brand-mark" />
+              Acuse
+            </Link>
+            <p className="lp-footer-tag">{t.footer.tagline}</p>
+            <p className="lp-footer-meaning">{t.footer.meaning}</p>
+          </div>
+          <div className="lp-footer-links">
+            <Link href="/app">{t.footer.console}</Link>
+            <a href={GITHUB} target="_blank" rel="noreferrer">
+              {t.footer.github}
+            </a>
+            <a href={`${GITHUB}/blob/main/LICENSE`} target="_blank" rel="noreferrer">
+              MIT
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
