@@ -32,9 +32,9 @@ lost without a trace.
 
 *Acuse* is short for *acuse de recibo*, Spanish for acknowledgment of receipt.
 
-> **Run it in one command:** `docker compose up -d`, and the console is at
-> `http://localhost:3000`. Full walkthrough in the
-> [five-minute quickstart](docs/QUICKSTART.md).
+> **Run it in one command:** `docker compose up -d`. The landing page is at
+> `http://localhost:3000` and the console is at `http://localhost:3000/app`.
+> Full walkthrough in the [five-minute quickstart](docs/QUICKSTART.md).
 
 ## What you get
 
@@ -142,7 +142,8 @@ cd acuse
 docker compose up -d
 ```
 
-The console is at `http://localhost:3000`, or at your server's address. Data
+The console is at `http://localhost:3000/app`, or at your server's address (the
+landing page is at the root, `http://localhost:3000`). Data
 survives restarts; `docker compose down` stops everything. The first boot builds
 the image and takes a few minutes, after that it starts in seconds.
 

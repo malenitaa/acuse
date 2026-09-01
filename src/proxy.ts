@@ -2,7 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 /**
  * Optional console lock (OWASP A01, broken access control). Setting
- * CONSOLE_PASSWORD turns on HTTP Basic Auth for the operator console. The
+ * CONSOLE_PASSWORD turns on HTTP Basic Auth for the operator console, which
+ * lives under «/app». The public marketing landing at «/» stays open, and the
  * machine endpoints keep their own protections and stay out of the matcher:
  * ingest is public by design, cron checks CRON_SECRET, demo-sink is a demo
  * target. Without the variable, behavior is unchanged (open console for
@@ -41,8 +42,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Everything except: ingest, cron, demo-sink, static assets.
-    '/((?!api/i/|api/cron|api/demo-sink|_next/|favicon).*)',
-  ],
+  // Only the operator console is lockable. The landing («/»), the machine
+  // endpoints (ingest, cron, demo-sink) and static assets stay open.
+  matcher: ['/app', '/app/:path*'],
 }

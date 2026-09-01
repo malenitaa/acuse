@@ -32,7 +32,7 @@ export default async function EventsPage({
 
   return (
     <Sheet>
-      <BackStrip href="/">{t.events.back}</BackStrip>
+      <BackStrip href="/app">{t.events.back}</BackStrip>
 
       <Section>
         <SectionTitle
@@ -41,7 +41,7 @@ export default async function EventsPage({
               {filters.map((filter) => (
                 <Link
                   key={filter.value}
-                  href={filter.value === 'all' ? '/events' : `/events?status=${filter.value}`}
+                  href={filter.value === 'all' ? '/app/events' : `/app/events?status=${filter.value}`}
                   className={`border-b-2 py-0.5 text-[12px] transition-colors ${
                     status === filter.value
                       ? 'border-text text-text'
@@ -90,7 +90,7 @@ export default async function EventsPage({
                 >
                   <td className="px-6 py-2.5">
                     <Link
-                      href={`/events/${event.id}`}
+                      href={`/app/events/${event.id}`}
                       className="font-mono text-[12px] text-faint hover:text-accent"
                     >
                       {truncate(event.id, 16)}

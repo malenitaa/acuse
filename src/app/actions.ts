@@ -64,7 +64,7 @@ export async function createEndpointAction(
     [id, name, newId('ik', 20), destination, newSigningSecret(), maxAttempts],
   )
 
-  redirect(`/endpoints/${id}`)
+  redirect(`/app/endpoints/${id}`)
 }
 
 export type SendEventState = { error?: 'json' | 'date' | 'endpoint' }
